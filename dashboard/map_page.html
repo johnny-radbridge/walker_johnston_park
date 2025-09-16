@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -113,77 +114,90 @@
  
   <script>
     const selected = new Set();
-    const amenityMap = {};  // amenity → [h3 cells]
+    let receivedAmenities = false;
 
     function sendHighlight(mapFrame) {
-      let allCells = [];
-      selected.forEach(am => {
-        allCells = allCells.concat(amenityMap[am] || []);
-      });
-
-      if (allCells.length > 0) {
-        console.log("📤 Sending highlight:", allCells.length, "cells");
-        mapFrame.postMessage({ type: "highlightAmenity", h3cells: allCells }, "*");
+      if (selected.size > 0) {
+        const amenities = Array.from(selected);
+        console.log("📤 Sending highlightAmenities:", amenities.length, "selected");
+        mapFrame.postMessage({ type: "highlightAmenities", amenities }, "*");
       } else {
         console.log("📤 Sending clearHighlight");
         mapFrame.postMessage({ type: "clearHighlight" }, "*");
       }
     }
 
-    async function loadAmenities() {
-      try {
-        const res = await fetch("h3_count.tsv");
-        const text = await res.text();
-        const rows = text.trim().split("\n").slice(1); // skip header
+    function renderAmenityList(amenities) {
+      const listDiv = document.getElementById("amenityList");
+      listDiv.innerHTML = "";
+      const mapFrame = document.getElementById("mapFrame").contentWindow;
 
-        // Build amenity → [h3 cells] map
-        for (const row of rows) {
-          const cols = row.split("\t");
-          const h3 = cols[0];
-          const amenities = JSON.parse(cols[3].replace(/""/g, '"')); // parse array string
+      amenities.forEach(amenity => {
+        const div = document.createElement("div");
+        div.className = "amenity";
+        div.textContent = amenity;
 
-          for (const am of amenities) {
-            if (!amenityMap[am]) amenityMap[am] = [];
-            amenityMap[am].push(h3);
+        div.addEventListener("click", () => {
+          if (selected.has(amenity)) {
+            selected.delete(amenity);
+            div.classList.remove("active");
+          } else {
+            selected.add(amenity);
+            div.classList.add("active");
           }
-        }
-
-        const listDiv = document.getElementById("amenityList");
-        listDiv.innerHTML = "";
-        const mapFrame = document.getElementById("mapFrame").contentWindow;
-
-        Object.keys(amenityMap).sort().forEach(amenity => {
-          const div = document.createElement("div");
-          div.className = "amenity";
-          div.textContent = amenity;
-
-          div.addEventListener("click", () => {
-            if (selected.has(amenity)) {
-              selected.delete(amenity);
-              div.classList.remove("active");
-            } else {
-              selected.add(amenity);
-              div.classList.add("active");
-            }
-            sendHighlight(mapFrame);
-          });
-
-          listDiv.appendChild(div);
+          sendHighlight(mapFrame);
         });
 
-        document.getElementById("clearBtn").addEventListener("click", () => {
-          selected.clear();
-          document.querySelectorAll(".amenity").forEach(el => el.classList.remove("active"));
-          mapFrame.postMessage({ type: "clearHighlight" }, "*");
-        });
+        listDiv.appendChild(div);
+      });
 
-      } catch (err) {
-        console.error("❌ Failed to load h3_count.tsv", err);
-        document.getElementById("amenityList").textContent = "Failed to load amenities.";
-      }
+      document.getElementById("clearBtn").addEventListener("click", () => {
+        selected.clear();
+        document.querySelectorAll(".amenity").forEach(el => el.classList.remove("active"));
+        mapFrame.postMessage({ type: "clearHighlight" }, "*");
+      });
     }
 
-    window.addEventListener("load", loadAmenities);
+    // Listen for amenity list from the iframe
+    window.addEventListener("message", (event) => {
+      const data = event.data;
+      if (!data || !data.type) return;
+      if (data.type === "amenityList") {
+        receivedAmenities = true;
+        const amenities = (data.amenities || []).map(String).sort();
+        renderAmenityList(amenities);
+        console.log("✅ Received amenityList:", amenities.length);
+      }
+    });
+
+    // Request amenities from the iframe once it is loaded; retry briefly until ready
+    window.addEventListener("load", () => {
+      const iframe = document.getElementById("mapFrame");
+      const targetWindow = iframe.contentWindow;
+      const start = Date.now();
+      const retryMs = 300;
+      const timeoutMs = 8000;
+
+      const intervalId = setInterval(() => {
+        if (receivedAmenities) {
+          clearInterval(intervalId);
+          return;
+        }
+        try {
+          targetWindow.postMessage({ type: "requestAmenities" }, "*");
+          console.log("↗️ Requested amenities from iframe");
+        } catch (e) {
+          console.warn("PostMessage failed (retrying)", e);
+        }
+        if (Date.now() - start > timeoutMs) {
+          clearInterval(intervalId);
+          if (!receivedAmenities) {
+            document.getElementById("amenityList").textContent = "Amenities unavailable.";
+            console.error("❌ Timed out waiting for amenityList");
+          }
+        }
+      }, retryMs);
+    });
   </script>
 </body>
 </html>
