@@ -1,172 +1,189 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Amenities Map</title>
+  <meta charset="utf-8">
+  <title>Walker Johnston Park Map</title>
   <style>
-    :root { --sidebar-width: 320px; --accent: #2563eb; }
-    * { box-sizing: border-box; }
-    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif; color: #111827; }
-    .app { display: flex; min-height: 100vh; }
-    .sidebar { width: var(--sidebar-width); border-right: 1px solid #e5e7eb; padding: 12px; overflow: auto; }
-    .main { flex: 1; }
-    header { display: flex; align-items: center; gap: 8px; justify-content: space-between; margin-bottom: 8px; }
-    h1 { font-size: 16px; margin: 0; font-weight: 600; }
-    .controls { display: flex; gap: 8px; }
-    button { background: #f3f4f6; border: 1px solid #e5e7eb; border-radius: 8px; padding: 6px 10px; cursor: pointer; }
-    button.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
-    button:disabled { opacity: 0.5; cursor: not-allowed; }
-    .search { position: sticky; top: 0; background: #fff; padding-bottom: 8px; border-bottom: 1px solid #f3f4f6; margin-bottom: 8px; }
-    .search input { width: 100%; padding: 8px 10px; border: 1px solid #e5e7eb; border-radius: 8px; }
-    .list { display: grid; grid-template-columns: 1fr; gap: 4px; }
-    .item { display: flex; align-items: center; gap: 8px; padding: 6px 4px; border-radius: 6px; cursor: pointer; }
-    .item:hover { background: #f9fafb; }
-    .item input { margin: 0; }
-    .badge { margin-left: auto; font-size: 12px; color: #6b7280; display: none; }
-    .footer { position: sticky; bottom: 0; background: #fff; padding-top: 8px; border-top: 1px solid #f3f4f6; margin-top: 8px; display: flex; gap: 8px; }
-    iframe { width: 100%; height: 100vh; border: 0; }
+    body { 
+      font-family: sans-serif; 
+      margin: 0; 
+      padding: 0;
+      display: flex; 
+      flex-direction: column;
+      align-items: center;
+    }
+    header {
+      width: 100%;
+      background: #333;
+      color: white;
+      padding: 1rem;
+      text-align: center;
+    }
+    header a {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    main {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      width: 90%;
+      max-width: 1400px;
+      margin: 2rem auto;
+    }
+    .map-container {
+      flex: 3;
+      height: 80vh;
+      position: relative;
+    }
+    .map-container iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+    .sidebar {
+      flex: 1;
+      background: #f7f7f7;
+      padding: 1rem;
+      border: 1px solid #ddd;
+      overflow-y: auto;
+      position: relative;
+    }
+    .amenity {
+      padding: 0.4rem 0.6rem;
+      margin: 0.2rem 0;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: background 0.2s;
+    }
+    .amenity:hover {
+      background: #e0e0e0;
+    }
+    .amenity.active {
+      background: #d0d0d0;
+      font-weight: bold;
+    }
+    #clearBtn {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      padding: 0.4rem 0.8rem;
+      font-size: 0.9rem;
+      background: #444;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    #clearBtn:hover {
+      background: #666;
+    }
+    @media (max-width: 900px) {
+      main {
+        flex-direction: column;
+      }
+      .map-container, .sidebar {
+        flex: unset;
+        width: 100%;
+        height: 60vh;
+      }
+      #clearBtn {
+        position: static;
+        margin-bottom: 0.5rem;
+      }
+    }
   </style>
 </head>
 <body>
-  <div class="app">
+  <header>
+    <a href="index.html">← Back to Dashboard</a>
+  </header>
+  <main>
+    <div class="map-container">
+      <iframe id="mapFrame" src="map.html"></iframe>
+    </div>
     <aside class="sidebar">
-      <header>
-        <h1>Amenities</h1>
-        <div class="controls">
-          <button id="clearBtn">Clear</button>
-          <button id="applyBtn" class="primary">Highlight</button>
-        </div>
-      </header>
-      <div class="search">
-        <input id="searchInput" type="text" placeholder="Search amenities…" aria-label="Search amenities" />
-      </div>
-      <div id="amenityList" class="list" aria-live="polite"></div>
-      <div class="footer">
-        <button id="selectAllBtn">Select all</button>
-        <button id="selectNoneBtn">Select none</button>
-      </div>
+      <button id="clearBtn">Clear</button>
+      <h2>Amenity Visits</h2>
+      <div id="amenityList">(Loading amenities...)</div>
     </aside>
-    <main class="main">
-      <iframe id="mapFrame" src="map.html" title="H3 Map"></iframe>
-    </main>
-  </div>
-
+  </main>
+ 
   <script>
-    const AMENITY_NAMES_LONG = {
-      baseball_field: "Baseball Fields",
-      shaded_playground: "Shaded Playground",
-      pickleball_courts: "Pickleball Courts",
-      tennis_courts: "Tennis Courts",
-      skate_park: "Skate Park",
-      playground_1: "Playground (Main)",
-      toddler_playground: "Toddler Playground",
-      soccer_field_1: "Soccer Field",
-      playground_2: "Playground (Secondary)",
-      bridge: "Bridge",
-      pavilion: "Pavilion",
-      south_parking: "South Parking Lot",
-      north_parking: "North Parking Lot",
-      east_parking: "East Parking Lot",
-      pond_loop: "Pond Loop Trail",
-      practice_fields: "Practice Fields",
-      unknown: "Unspecified Area",
-      park_trail: "Park Trail",
-      baseball_walkways: "Ballfield Paths",
-      event_center: "Event Center",
-      wooden_boardwalk: "Wooden Boardwalk"
-    };
-  
-    const listEl = document.getElementById('amenityList');
-    const searchEl = document.getElementById('searchInput');
-    const clearBtn = document.getElementById('clearBtn');
-    const applyBtn = document.getElementById('applyBtn');
-    const selectAllBtn = document.getElementById('selectAllBtn');
-    const selectNoneBtn = document.getElementById('selectNoneBtn');
-    const mapFrame = document.getElementById('mapFrame');
-  
-    let allAmenities = Object.keys(AMENITY_NAMES_LONG);
     const selected = new Set();
-  
-    function postHighlight() {
-      try {
-        const payload = { type: 'highlightAmenities', amenities: Array.from(selected) };
-        console.log("📤 Sending highlight payload to map.html:", payload);
-        mapFrame.contentWindow?.postMessage(payload, '*');
-      } catch (err) {
-        console.error("❌ Error posting highlight message:", err);
+    const amenityMap = {};  // amenity → [h3 cells]
+
+    function sendHighlight(mapFrame) {
+      let allCells = [];
+      selected.forEach(am => {
+        allCells = allCells.concat(amenityMap[am] || []);
+      });
+
+      if (allCells.length > 0) {
+        console.log("📤 Sending highlight:", allCells.length, "cells");
+        mapFrame.postMessage({ type: "highlightAmenity", h3cells: allCells }, "*");
+      } else {
+        console.log("📤 Sending clearHighlight");
+        mapFrame.postMessage({ type: "clearHighlight" }, "*");
       }
     }
-  
-    function postClear() {
+
+    async function loadAmenities() {
       try {
-        console.log("📤 Sending clearHighlight message");
-        mapFrame.contentWindow?.postMessage({ type: 'clearHighlight' }, '*');
-      } catch (err) {
-        console.error("❌ Error posting clear message:", err);
-      }
-    }
-  
-    function renderList(filter = '') {
-      const q = filter.trim().toLowerCase();
-      listEl.innerHTML = '';
-      const items = q ? allAmenities.filter(a => AMENITY_NAMES_LONG[a].toLowerCase().includes(q)) : allAmenities;
-      for (const code of items) {
-        const div = document.createElement('div');
-        div.className = 'amenity';
-        if (selected.has(code)) div.classList.add('active');
-        div.textContent = AMENITY_NAMES_LONG[code] || code;
-  
-        div.addEventListener('click', () => {
-          if (selected.has(code)) {
-            console.log("❎ Deselected amenity:", code);
-            selected.delete(code);
-            div.classList.remove('active');
-          } else {
-            console.log("✅ Selected amenity:", code);
-            selected.add(code);
-            div.classList.add('active');
+        const res = await fetch("h3_count.tsv");
+        const text = await res.text();
+        const rows = text.trim().split("\n").slice(1); // skip header
+
+        // Build amenity → [h3 cells] map
+        for (const row of rows) {
+          const cols = row.split("\t");
+          const h3 = cols[0];
+          const amenities = JSON.parse(cols[3].replace(/""/g, '"')); // parse array string
+
+          for (const am of amenities) {
+            if (!amenityMap[am]) amenityMap[am] = [];
+            amenityMap[am].push(h3);
           }
+        }
+
+        const listDiv = document.getElementById("amenityList");
+        listDiv.innerHTML = "";
+        const mapFrame = document.getElementById("mapFrame").contentWindow;
+
+        Object.keys(amenityMap).sort().forEach(amenity => {
+          const div = document.createElement("div");
+          div.className = "amenity";
+          div.textContent = amenity;
+
+          div.addEventListener("click", () => {
+            if (selected.has(amenity)) {
+              selected.delete(amenity);
+              div.classList.remove("active");
+            } else {
+              selected.add(amenity);
+              div.classList.add("active");
+            }
+            sendHighlight(mapFrame);
+          });
+
+          listDiv.appendChild(div);
         });
-  
-        listEl.appendChild(div);
+
+        document.getElementById("clearBtn").addEventListener("click", () => {
+          selected.clear();
+          document.querySelectorAll(".amenity").forEach(el => el.classList.remove("active"));
+          mapFrame.postMessage({ type: "clearHighlight" }, "*");
+        });
+
+      } catch (err) {
+        console.error("❌ Failed to load h3_count.tsv", err);
+        document.getElementById("amenityList").textContent = "Failed to load amenities.";
       }
-      console.log("🔄 Rendered amenity list. Current selection:", Array.from(selected));
     }
-  
-    searchEl.addEventListener('input', () => {
-      console.log("🔍 Search input:", searchEl.value);
-      renderList(searchEl.value);
-    });
-  
-    clearBtn.addEventListener('click', () => {
-      console.log("🧹 Clear button clicked");
-      selected.clear();
-      renderList(searchEl.value);
-      postClear();
-    });
-  
-    applyBtn.addEventListener('click', () => {
-      console.log("🚀 Apply button clicked");
-      postHighlight();
-    });
-  
-    selectAllBtn.addEventListener('click', () => {
-      console.log("✔ Select all clicked");
-      for (const a of allAmenities) selected.add(a);
-      renderList(searchEl.value);
-    });
-  
-    selectNoneBtn.addEventListener('click', () => {
-      console.log("❌ Select none clicked");
-      selected.clear();
-      renderList(searchEl.value);
-    });
-  
-    window.addEventListener('load', () => {
-      console.log("🌍 Page loaded. Rendering amenities…");
-      renderList();
-    });
-  </script>  
+
+    window.addEventListener("load", loadAmenities);
+  </script>
 </body>
 </html>
