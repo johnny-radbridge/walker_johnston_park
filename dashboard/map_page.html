@@ -76,7 +76,7 @@
       event_center: "Event Center",
       wooden_boardwalk: "Wooden Boardwalk"
     };
-
+  
     const listEl = document.getElementById('amenityList');
     const searchEl = document.getElementById('searchInput');
     const clearBtn = document.getElementById('clearBtn');
@@ -84,60 +84,89 @@
     const selectAllBtn = document.getElementById('selectAllBtn');
     const selectNoneBtn = document.getElementById('selectNoneBtn');
     const mapFrame = document.getElementById('mapFrame');
-
+  
     let allAmenities = Object.keys(AMENITY_NAMES_LONG);
     const selected = new Set();
-
+  
     function postHighlight() {
-      const payload = { type: 'highlightAmenities', amenities: Array.from(selected) };
-      mapFrame.contentWindow?.postMessage(payload, '*');
+      try {
+        const payload = { type: 'highlightAmenities', amenities: Array.from(selected) };
+        console.log("📤 Sending highlight payload to map.html:", payload);
+        mapFrame.contentWindow?.postMessage(payload, '*');
+      } catch (err) {
+        console.error("❌ Error posting highlight message:", err);
+      }
     }
-
+  
     function postClear() {
-      mapFrame.contentWindow?.postMessage({ type: 'clearHighlight' }, '*');
+      try {
+        console.log("📤 Sending clearHighlight message");
+        mapFrame.contentWindow?.postMessage({ type: 'clearHighlight' }, '*');
+      } catch (err) {
+        console.error("❌ Error posting clear message:", err);
+      }
     }
-
+  
     function renderList(filter = '') {
       const q = filter.trim().toLowerCase();
       listEl.innerHTML = '';
       const items = q ? allAmenities.filter(a => AMENITY_NAMES_LONG[a].toLowerCase().includes(q)) : allAmenities;
       for (const code of items) {
-        const id = `amenity-${code}`;
-        const row = document.createElement('label');
-        row.className = 'item';
-        row.htmlFor = id;
-        const cb = document.createElement('input');
-        cb.type = 'checkbox';
-        cb.id = id;
-        cb.checked = selected.has(code);
-        cb.addEventListener('change', () => {
-          if (cb.checked) selected.add(code); else selected.delete(code);
+        const div = document.createElement('div');
+        div.className = 'amenity';
+        if (selected.has(code)) div.classList.add('active');
+        div.textContent = AMENITY_NAMES_LONG[code] || code;
+  
+        div.addEventListener('click', () => {
+          if (selected.has(code)) {
+            console.log("❎ Deselected amenity:", code);
+            selected.delete(code);
+            div.classList.remove('active');
+          } else {
+            console.log("✅ Selected amenity:", code);
+            selected.add(code);
+            div.classList.add('active');
+          }
         });
-        const text = document.createElement('span');
-        text.textContent = AMENITY_NAMES_LONG[code] || code;
-        row.appendChild(cb);
-        row.appendChild(text);
-        listEl.appendChild(row);
+  
+        listEl.appendChild(div);
       }
+      console.log("🔄 Rendered amenity list. Current selection:", Array.from(selected));
     }
-
-    searchEl.addEventListener('input', () => renderList(searchEl.value));
+  
+    searchEl.addEventListener('input', () => {
+      console.log("🔍 Search input:", searchEl.value);
+      renderList(searchEl.value);
+    });
+  
     clearBtn.addEventListener('click', () => {
+      console.log("🧹 Clear button clicked");
       selected.clear();
       renderList(searchEl.value);
       postClear();
     });
-    applyBtn.addEventListener('click', () => postHighlight());
+  
+    applyBtn.addEventListener('click', () => {
+      console.log("🚀 Apply button clicked");
+      postHighlight();
+    });
+  
     selectAllBtn.addEventListener('click', () => {
+      console.log("✔ Select all clicked");
       for (const a of allAmenities) selected.add(a);
       renderList(searchEl.value);
     });
+  
     selectNoneBtn.addEventListener('click', () => {
+      console.log("❌ Select none clicked");
       selected.clear();
       renderList(searchEl.value);
     });
-
-    window.addEventListener('load', () => renderList());
-  </script>
+  
+    window.addEventListener('load', () => {
+      console.log("🌍 Page loaded. Rendering amenities…");
+      renderList();
+    });
+  </script>  
 </body>
 </html>
