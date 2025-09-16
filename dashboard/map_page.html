@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Amenities Map</title>
+  <style>
+    :root { --sidebar-width: 320px; --accent: #2563eb; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif; color: #111827; }
+    .app { display: flex; min-height: 100vh; }
+    .sidebar { width: var(--sidebar-width); border-right: 1px solid #e5e7eb; padding: 12px; overflow: auto; }
+    .main { flex: 1; }
+    header { display: flex; align-items: center; gap: 8px; justify-content: space-between; margin-bottom: 8px; }
+    h1 { font-size: 16px; margin: 0; font-weight: 600; }
+    .controls { display: flex; gap: 8px; }
+    button { background: #f3f4f6; border: 1px solid #e5e7eb; border-radius: 8px; padding: 6px 10px; cursor: pointer; }
+    button.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .search { position: sticky; top: 0; background: #fff; padding-bottom: 8px; border-bottom: 1px solid #f3f4f6; margin-bottom: 8px; }
+    .search input { width: 100%; padding: 8px 10px; border: 1px solid #e5e7eb; border-radius: 8px; }
+    .list { display: grid; grid-template-columns: 1fr; gap: 4px; }
+    .item { display: flex; align-items: center; gap: 8px; padding: 6px 4px; border-radius: 6px; cursor: pointer; }
+    .item:hover { background: #f9fafb; }
+    .item input { margin: 0; }
+    .badge { margin-left: auto; font-size: 12px; color: #6b7280; display: none; }
+    .footer { position: sticky; bottom: 0; background: #fff; padding-top: 8px; border-top: 1px solid #f3f4f6; margin-top: 8px; display: flex; gap: 8px; }
+    iframe { width: 100%; height: 100vh; border: 0; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <header>
+        <h1>Amenities</h1>
+        <div class="controls">
+          <button id="clearBtn">Clear</button>
+          <button id="applyBtn" class="primary">Highlight</button>
+        </div>
+      </header>
+      <div class="search">
+        <input id="searchInput" type="text" placeholder="Search amenities…" aria-label="Search amenities" />
+      </div>
+      <div id="amenityList" class="list" aria-live="polite"></div>
+      <div class="footer">
+        <button id="selectAllBtn">Select all</button>
+        <button id="selectNoneBtn">Select none</button>
+      </div>
+    </aside>
+    <main class="main">
+      <iframe id="mapFrame" src="map.html" title="H3 Map"></iframe>
+    </main>
+  </div>
+
+  <script>
+    const AMENITY_NAMES_LONG = {
+      baseball_field: "Baseball Fields",
+      shaded_playground: "Shaded Playground",
+      pickleball_courts: "Pickleball Courts",
+      tennis_courts: "Tennis Courts",
+      skate_park: "Skate Park",
+      playground_1: "Playground (Main)",
+      toddler_playground: "Toddler Playground",
+      soccer_field_1: "Soccer Field",
+      playground_2: "Playground (Secondary)",
+      bridge: "Bridge",
+      pavilion: "Pavilion",
+      south_parking: "South Parking Lot",
+      north_parking: "North Parking Lot",
+      east_parking: "East Parking Lot",
+      pond_loop: "Pond Loop Trail",
+      practice_fields: "Practice Fields",
+      unknown: "Unspecified Area",
+      park_trail: "Park Trail",
+      baseball_walkways: "Ballfield Paths",
+      event_center: "Event Center",
+      wooden_boardwalk: "Wooden Boardwalk"
+    };
+
+    const listEl = document.getElementById('amenityList');
+    const searchEl = document.getElementById('searchInput');
+    const clearBtn = document.getElementById('clearBtn');
+    const applyBtn = document.getElementById('applyBtn');
+    const selectAllBtn = document.getElementById('selectAllBtn');
+    const selectNoneBtn = document.getElementById('selectNoneBtn');
+    const mapFrame = document.getElementById('mapFrame');
+
+    let allAmenities = Object.keys(AMENITY_NAMES_LONG);
+    const selected = new Set();
+
+    function postHighlight() {
+      const payload = { type: 'highlightAmenities', amenities: Array.from(selected) };
+      mapFrame.contentWindow?.postMessage(payload, '*');
+    }
+
+    function postClear() {
+      mapFrame.contentWindow?.postMessage({ type: 'clearHighlight' }, '*');
+    }
+
+    function renderList(filter = '') {
+      const q = filter.trim().toLowerCase();
+      listEl.innerHTML = '';
+      const items = q ? allAmenities.filter(a => AMENITY_NAMES_LONG[a].toLowerCase().includes(q)) : allAmenities;
+      for (const code of items) {
+        const id = `amenity-${code}`;
+        const row = document.createElement('label');
+        row.className = 'item';
+        row.htmlFor = id;
+        const cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.id = id;
+        cb.checked = selected.has(code);
+        cb.addEventListener('change', () => {
+          if (cb.checked) selected.add(code); else selected.delete(code);
+        });
+        const text = document.createElement('span');
+        text.textContent = AMENITY_NAMES_LONG[code] || code;
+        row.appendChild(cb);
+        row.appendChild(text);
+        listEl.appendChild(row);
+      }
+    }
+
+    searchEl.addEventListener('input', () => renderList(searchEl.value));
+    clearBtn.addEventListener('click', () => {
+      selected.clear();
+      renderList(searchEl.value);
+      postClear();
+    });
+    applyBtn.addEventListener('click', () => postHighlight());
+    selectAllBtn.addEventListener('click', () => {
+      for (const a of allAmenities) selected.add(a);
+      renderList(searchEl.value);
+    });
+    selectNoneBtn.addEventListener('click', () => {
+      selected.clear();
+      renderList(searchEl.value);
+    });
+
+    window.addEventListener('load', () => renderList());
+  </script>
+</body>
+</html>
