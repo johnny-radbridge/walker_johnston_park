@@ -1,67 +1,673 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>Walker Johnston Park Dashboard</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Walker Johnston Park - Data Dashboard</title>
   <style>
-    body { 
-      font-family: sans-serif; 
+    * {
       margin: 0;
       padding: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      box-sizing: border-box;
     }
-    header {
-      width: 100%;
-      background: #333;
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #f8fafc;
+      color: #2d3748;
+      line-height: 1.6;
+    }
+
+    /* Hero Section */
+    .hero {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
-      padding: 1rem;
+      padding: 4rem 0 6rem 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+      opacity: 0.3;
+    }
+
+    .hero-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 2rem;
       text-align: center;
+      position: relative;
+      z-index: 2;
     }
-    main {
-      display: flex;
-      justify-content: center;
-      width: 100%;
+
+    .hero-title {
+      font-size: 3.5rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+      text-shadow: 2px 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .hero-subtitle {
+      font-size: 1.5rem;
+      opacity: 0.9;
+      margin-bottom: 2rem;
+      font-weight: 300;
+    }
+
+    .hero-stats {
+      display: grid;
+      /* Force four equal columns on wide screens, but allow shrinking on small screens */
+      grid-template-columns: repeat(4, minmax(180px, 1fr));
+      gap: 2rem;
+      margin-top: 3rem;
+      /* widen max so four cards fit on a single row on desktop */
       max-width: 1200px;
-      margin: 2rem auto;
+      margin-left: auto;
+      margin-right: auto;
     }
-    .dashboard-container {
-      width: 60%;
-      min-width: 500px;
+
+    .hero-stat {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      border-radius: 15px;
+      padding: 1.5rem;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: transform 0.3s ease;
     }
-    iframe {
+
+    .hero-stat:hover {
+      transform: translateY(-5px);
+    }
+
+    .hero-stat-value {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .hero-stat-label {
+      font-size: 0.875rem;
+      opacity: 0.8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Section Styling */
+    .section {
+      padding: 4rem 0;
+    }
+
+    .section-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    .section-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .section-subtitle {
+      font-size: 1.2rem;
+      color: #64748b;
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    /* Dashboard Section */
+    .dashboard-section {
+      background: white;
+      border-top: 1px solid #e2e8f0;
+    }
+
+    .dashboard-wrapper {
+      position: relative;
+      overflow: hidden;
+      /* Isolate the iframe to prevent scroll propagation */
+      isolation: isolate;
+    }
+
+    .dashboard-frame {
       width: 100%;
       height: 80vh;
-      border: 0;
+      border: none;
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      /* Prevent iframe from stealing focus when it reloads */
+      pointer-events: auto;
+      /* Additional isolation */
+      position: relative;
+      z-index: 1;
     }
-    footer {
-      margin: 2rem;
+
+    /* Map Analysis Section */
+    .map-section {
+      background: #f8fafc;
     }
-    a {
-      color: #007acc;
+
+    .analysis-container {
+      display: grid;
+      grid-template-columns: 1fr 350px;
+      gap: 2rem;
+      height: 90vh;
+    }
+
+    .map-container {
+      background: white;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      position: relative;
+    }
+
+    .map-container iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    .amenity-panel {
+      background: white;
+      border-radius: 20px;
+      padding: 2rem;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      overflow-y: auto;
+    }
+
+    .amenity-panel h3 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      text-align: center;
+      color: #2d3748;
+    }
+
+    .amenity-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .amenity-item {
+      padding: 1rem 1.25rem;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+      background: #f8fafc;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .amenity-item:hover {
+      background: linear-gradient(135deg, #f7fafc, #edf2f7);
+      transform: translateY(-2px);
+      border-color: #e2e8f0;
+    }
+
+    .amenity-item.active {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      transform: scale(1.02);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .amenity-name {
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .amenity-stats {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      font-size: 0.875rem;
+    }
+
+    .amenity-percentage {
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+    }
+
+    .amenity-count {
+      opacity: 0.7;
+      font-size: 0.8rem;
+    }
+
+    .amenity-item.active .amenity-count {
+      opacity: 0.9;
+    }
+
+    .clear-button {
+      width: 100%;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-bottom: 1.5rem;
+    }
+
+    .clear-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .loading-state {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #64748b;
+      font-style: italic;
+      padding: 2rem;
+    }
+
+    /* Footer */
+    .footer {
+      background: #2d3748;
+      color: white;
+      text-align: center;
+      padding: 2rem 0;
+    }
+
+    .footer a {
+      color: #667eea;
       text-decoration: none;
-      font-weight: bold;
+      font-weight: 600;
+      transition: color 0.3s ease;
     }
+
+    .footer a:hover {
+      color: #764ba2;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+      .analysis-container {
+        grid-template-columns: 1fr;
+        height: auto;
+      }
+
+      .map-container {
+        height: 60vh;
+        margin-bottom: 2rem;
+      }
+
+      .amenity-panel {
+        max-height: 500px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .hero-title {
+        font-size: 2.5rem;
+      }
+
+      .hero-subtitle {
+        font-size: 1.2rem;
+      }
+
+      .hero-stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .section-title {
+        font-size: 2rem;
+      }
+
+      .dashboard-frame {
+        height: 70vh;
+      }
+
+      .analysis-container {
+        gap: 1rem;
+      }
+
+      .section-content {
+        padding: 0 1rem;
+      }
+    }
+
   </style>
 </head>
 <body>
-  <header>
-    <h1>Walker Johnston Park Dashboard</h1>
-  </header>
-
-  <main>
-    <div class="dashboard-container">
-      <p>This dashboard shows key metrics for Walker Johnston Park.</p>
-      <iframe 
-        src="https://lookerstudio.google.com/embed/reporting/e5bb20c8-ec05-4411-95b0-54f3f8a7447b/page/p_ftpwxmqptd"
-        allowfullscreen>
-      </iframe>
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1 class="hero-title">Visitation Analysis of Walker Johnston Park</h1>
+      <p class="hero-subtitle">A spatial and temporal view of visitor patterns based on anonymized mobile location data</p>
+      
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <div class="hero-stat-value">422K</div>
+          <div class="hero-stat-label">Total Pings</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-value">20.9K</div>
+          <div class="hero-stat-label">Unique Devices</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-value">33.6K</div>
+          <div class="hero-stat-label">Device Days</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-value">3.75</div>
+          <div class="hero-stat-label">Years Analyzed</div>
+        </div>
+      </div>
     </div>
-  </main>
+  </section>
 
-  <footer>
-    <p><a href="map_page.html">See the interactive map →</a></p>
+  <!-- About Section -->
+  <section class="section" style="background: white;">
+    <div class="section-content">
+      <h2 class="section-title">About This Analysis</h2>
+      <div style="max-width: 800px; margin: 0 auto; text-align: left; line-height: 1.8; font-size: 1.1rem; color: #4a5568;">
+        <p style="margin-bottom: 1.5rem;">📍 <strong>Walker Johnston Park | Urbandale, Iowa</strong></p>
+        <p style="margin-bottom: 1.5rem;">This analysis uses anonymized and aggregated mobile location data covering <strong>January 1, 2022 through August 30, 2025</strong> at Walker Johnston Park.</p>
+        <p style="margin-bottom: 1.5rem;">The dataset provides insights into visitor behavior patterns and may include bias depending on smartphone ownership and location-sharing preferences among different user groups.</p>
+        <p>A special filter was applied to identify devices spending at least <strong>15 minutes in the baseball field area</strong>, enabling separate analysis of baseball field visits, non-baseball field visits, and all park visits.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Methods Section -->
+  <section class="section" style="background: #f8fafc;">
+    <div class="section-content">
+      <h2 class="section-title">Data Cleaning & Processing</h2>
+      <div style="max-width: 800px; margin: 0 auto;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-top: 2rem;">
+          <div style="background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+            <h3 style="color: #667eea; margin-bottom: 1rem; font-size: 1.2rem;">🧹 Data Cleaning</h3>
+            <ul style="list-style: none; padding: 0; line-height: 1.6;">
+              <li style="margin-bottom: 0.5rem;">• Removed duplicate location pings</li>
+              <li style="margin-bottom: 0.5rem;">• Filtered out pass-through traffic (devices staying less than 15 minutes)</li>
+            </ul>
+          </div>
+          <div style="background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+            <h3 style="color: #667eea; margin-bottom: 1rem; font-size: 1.2rem;">🎯 Quality Filters</h3>
+            <ul style="list-style: none; padding: 0; line-height: 1.6;">
+              <li style="margin-bottom: 0.5rem;">• Excluded likely residents and employees (frequent evening/daytime presence within 200 meters)</li>
+              <li style="margin-bottom: 0.5rem;">• Applied additional proprietary techniques to improve visit accuracy</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Dashboard Section -->
+  <section class="section dashboard-section" id="dashboard">
+    <div class="section-content">
+      <h2 class="section-title">Interactive Dashboard</h2>
+      <p class="section-subtitle">Detailed analytics and key performance indicators</p>
+      
+      <div class="dashboard-wrapper" style="position: relative; overflow: hidden;">
+        <iframe 
+          class="dashboard-frame"
+          src="https://lookerstudio.google.com/embed/reporting/e5bb20c8-ec05-4411-95b0-54f3f8a7447b/page/p_ftpwxmqptd"
+          style="border:0;"
+          allowfullscreen
+          tabindex="-1"
+          scrolling="no"
+          sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-presentation">
+        </iframe>
+      </div>
+    </div>
+  </section>
+
+  <!-- Map Analysis Section -->
+  <section class="section map-section">
+    <div class="section-content">
+      <h2 class="section-title">Amenity Usage Heatmap</h2>
+      <p class="section-subtitle">Explore visitor patterns across different park amenities</p>
+      
+      <div class="analysis-container">
+        <div class="map-container">
+          <iframe id="mapFrame" src="map.html"></iframe>
+        </div>
+        
+        <div class="amenity-panel">
+          <button id="clearBtn" class="clear-button">Clear Selection</button>
+          <h3>Park Amenities</h3>
+          <div id="amenityList" class="amenity-list loading-state">(Loading amenities...)</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>
+      Walker Johnston Park Data Analysis © 2025
+    </p>
   </footer>
+
+  <script>
+    const selected = new Set();
+    let receivedAmenities = false;
+
+    function sendHighlight(mapFrame) {
+      if (selected.size > 0) {
+        const amenities = Array.from(selected);
+        console.log("📤 Sending highlightAmenities:", amenities.length, "selected");
+        mapFrame.postMessage({ type: "highlightAmenities", amenities }, "*");
+      } else {
+        console.log("📤 Sending clearHighlight");
+        mapFrame.postMessage({ type: "clearHighlight" }, "*");
+      }
+    }
+
+    function renderAmenityList(amenities) {
+      const listDiv = document.getElementById("amenityList");
+      listDiv.innerHTML = "";
+      listDiv.classList.remove("loading-state");
+
+      const mapFrame = document.getElementById("mapFrame").contentWindow;
+
+      // Human readable crosswalk (keeps keys identical to back-end codes)
+      const AMENITY_NAMES_LONG = {
+        "baseball_field": "Baseball Fields",
+        "shaded_playground": "Shaded Playground",
+        "pickleball_courts": "Pickleball Courts",
+        "tennis_courts": "Tennis Courts",
+        "skate_park": "Skate Park",
+        "playground_1": "Playground (Main)",
+        "toddler_playground": "Toddler Playground",
+        "soccer_field_1": "Soccer Field",
+        "playground_2": "Playground (Secondary)",
+        "bridge": "Bridge",
+        "pavilion": "Pavilion",
+        "south_parking": "South Parking Lot",
+        "north_parking": "North Parking Lot",
+        "east_parking": "East Parking Lot",
+        "pond_loop": "Pond Loop Trail",
+        "practice_fields": "Practice Fields",
+        "unknown": "Unspecified Area",
+        "park_trail": "Park Trail",
+        "baseball_walkways": "Ballfield Paths",
+        "event_center": "Event Center",
+        "wooden_boardwalk": "Wooden Boardwalk",
+      };
+
+      amenities.forEach((amenityCode, index) => {
+        const div = document.createElement("div");
+        div.className = "amenity-item";
+        // store the original code so we can send it back when highlighting
+        div.dataset.code = String(amenityCode);
+
+        const humanName = AMENITY_NAMES_LONG[amenityCode] || amenityCode;
+        div.innerHTML = `
+          <div class="amenity-name">${humanName}</div>
+        `;
+
+        // Animation removed
+
+        div.addEventListener("click", () => {
+          // Use stored code for selection and messaging
+          const amenityKey = div.dataset.code;
+          const isActive = selected.has(amenityKey);
+          selected.clear();
+          document.querySelectorAll(".amenity-item").forEach(el => el.classList.remove("active"));
+
+          if (!isActive) {
+            selected.add(amenityKey);
+            div.classList.add("active");
+          }
+
+          sendHighlight(mapFrame);
+        });
+
+        listDiv.appendChild(div);
+      });
+
+      // Clear button functionality
+      document.getElementById("clearBtn").addEventListener("click", () => {
+        selected.clear();
+        document.querySelectorAll(".amenity-item").forEach(el => el.classList.remove("active"));
+        mapFrame.postMessage({ type: "clearHighlight" }, "*");
+      });
+    }
+
+    // Listen for amenity list from the iframe
+    window.addEventListener("message", (event) => {
+      const data = event.data;
+      if (!data || !data.type) return;
+      
+      if (data.type === "amenityList") {
+        receivedAmenities = true;
+        const amenities = (data.amenities || []).map(String).sort();
+        renderAmenityList(amenities);
+        console.log("✅ Received amenityList:", amenities.length);
+      }
+    });
+
+    // Request amenities from the iframe once it is loaded; retry briefly until ready
+    window.addEventListener("load", () => {
+      const iframe = document.getElementById("mapFrame");
+      const targetWindow = iframe.contentWindow;
+      const start = Date.now();
+      const retryMs = 300;
+      const timeoutMs = 8000;
+
+      const intervalId = setInterval(() => {
+        if (receivedAmenities) {
+          clearInterval(intervalId);
+          return;
+        }
+
+        try {
+          targetWindow.postMessage({ type: "requestAmenities" }, "*");
+          console.log("↗️ Requested amenities from iframe");
+        } catch (e) {
+          console.warn("PostMessage failed (retrying)", e);
+        }
+
+        if (Date.now() - start > timeoutMs) {
+          clearInterval(intervalId);
+          if (!receivedAmenities) {
+            const listDiv = document.getElementById("amenityList");
+            listDiv.textContent = "Amenities unavailable - please refresh the page.";
+            listDiv.style.color = "#e53e3e";
+            console.error("❌ Timed out waiting for amenityList");
+          }
+        }
+      }, retryMs);
+    });
+
+    // Aggressive scroll prevention for iframe interactions
+    (function() {
+      let scrollLocked = false;
+      let lastScrollY = window.pageYOffset;
+      
+      // Lock scroll position when hovering over or focusing on the dashboard iframe
+      const dashboardWrapper = document.querySelector('.dashboard-wrapper');
+      const dashboardFrame = document.querySelector('.dashboard-frame');
+      
+      if (dashboardWrapper && dashboardFrame) {
+        // Prevent scroll when interacting with iframe
+        dashboardWrapper.addEventListener('mouseenter', () => {
+          scrollLocked = true;
+          lastScrollY = window.pageYOffset;
+        });
+        
+        dashboardWrapper.addEventListener('mouseleave', () => {
+          scrollLocked = false;
+        });
+        
+        // Block scroll events during iframe interaction
+        window.addEventListener('scroll', (e) => {
+          if (scrollLocked) {
+            window.scrollTo(0, lastScrollY);
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+          }
+        }, { passive: false });
+        
+        // Prevent focus-based scrolling
+        dashboardFrame.addEventListener('focus', (e) => {
+          e.preventDefault();
+          const currentScroll = window.pageYOffset;
+          setTimeout(() => {
+            window.scrollTo(0, currentScroll);
+          }, 0);
+        });
+        
+        // Intercept and block any scroll attempts from iframe
+        dashboardFrame.addEventListener('load', () => {
+          try {
+            // Save current scroll position before iframe loads
+            const scrollBefore = window.pageYOffset;
+            
+            // Restore scroll position after a brief delay
+            setTimeout(() => {
+              if (window.pageYOffset !== scrollBefore) {
+                window.scrollTo(0, scrollBefore);
+              }
+            }, 100);
+          } catch (e) {
+            // Silently handle any cross-origin errors
+          }
+        });
+        
+        // Additional protection against programmatic scrolling
+        const originalScrollTo = window.scrollTo;
+        const originalScrollBy = window.scrollBy;
+        
+        window.scrollTo = function(...args) {
+          if (!scrollLocked) {
+            originalScrollTo.apply(window, args);
+          }
+        };
+        
+        window.scrollBy = function(...args) {
+          if (!scrollLocked) {
+            originalScrollBy.apply(window, args);
+          }
+        };
+      }
+    })();
+  </script>
 </body>
 </html>
