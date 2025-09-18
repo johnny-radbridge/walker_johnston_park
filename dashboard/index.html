@@ -11,31 +11,245 @@
       box-sizing: border-box;
     }
 
+    html {
+      scroll-behavior: smooth;
+    }
+
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       background: #f8fafc;
       color: #2d3748;
       line-height: 1.6;
+      overflow: hidden;
+      height: 100vh;
+    }
+
+    /* Full page scroll container */
+    .scroll-container {
+      height: 100vh;
+      overflow-y: auto;
+      scroll-behavior: smooth;
+      position: relative;
+    }
+
+    /* Sections */
+    .scroll-section {
+      min-height: 100vh;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    /* Left Sidebar Navigation (slim, minimalist) */
+    .sidebar-nav {
+      position: fixed;
+      left: 0;
+      top: 0;
+      height: 100vh;
+      width: 180px; /* reduced width for a sleeker look */
+      background: #ffffff;
+      box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.02); /* very subtle outline */
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.25s ease, width 0.25s ease;
+    }
+
+    .sidebar-brand {
+      padding: 1rem 1rem;
+      border-bottom: 1px solid #eef2f5;
+      font-weight: 600;
+      font-size: 0.95rem; /* smaller brand text */
+      color: #111827;
+      background: transparent;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .sidebar-links {
+      list-style: none;
+      padding: 0.5rem 0;
+      margin: 0;
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      padding: 0.625rem 1rem; /* compact spacing */
+      cursor: pointer;
+      transition: background 0.18s ease, color 0.18s ease;
+      color: #475569; /* muted slate */
+      position: relative;
+      gap: 0.6rem;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    .sidebar-link:hover {
+      background: rgba(17,24,39,0.03);
+      color: #0f172a;
+    }
+
+    .sidebar-link.active {
+      background: rgba(17,24,39,0.04);
+      color: #0f172a;
+      border-left: 3px solid #0f172a; /* subtle active indicator */
+      padding-left: calc(1rem - 3px);
+    }
+
+    .sidebar-icon {
+      width: 1.25rem;
+      height: 1.25rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #9aa4ad; /* light professional gray for icons */
+      flex: 0 0 1.25rem;
+    }
+
+    .sidebar-icon svg {
+      width: 18px;
+      height: 18px;
+      display: block;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.5;
+    }
+
+    .sidebar-text {
+      font-weight: 500;
+      font-size: 0.86rem; /* smaller nav text */
+      letter-spacing: 0.2px;
+      color: inherit;
+    }
+
+    /* Adjust main content for sidebar */
+    .scroll-container {
+      margin-left: 180px;
+    }
+
+    /* Collapsed sidebar styles */
+    .sidebar-nav.collapsed {
+      width: 56px;
+    }
+
+    .sidebar-nav.collapsed .sidebar-text {
+      display: none;
+    }
+
+    .sidebar-nav.collapsed .sidebar-brand span.brand-text {
+      display: none;
+    }
+
+    .sidebar-nav.collapsed .sidebar-link {
+      justify-content: center;
+      padding-left: 0.5rem;
+      padding-right: 0.5rem;
+    }
+
+    .sidebar-nav.collapsed .sidebar-icon {
+      color: #6b7280; /* slightly darker gray when collapsed */
+    }
+
+    .collapse-btn {
+      background: transparent;
+      border: none;
+      width: 34px;
+      height: 34px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: #9aa4ad;
+      padding: 0;
+      border-radius: 6px;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+
+    .collapse-btn:hover {
+      background: rgba(17,24,39,0.03);
+      color: #0f172a;
+    }
+
+    /* Section navigation dots */
+    .section-nav {
+      position: fixed;
+      right: 2rem;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .nav-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: rgba(102, 126, 234, 0.3);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+    }
+
+    .nav-dot:hover {
+      transform: scale(1.2);
+      background: rgba(102, 126, 234, 0.5);
+    }
+
+    .nav-dot.active {
+      background: #667eea;
+      transform: scale(1.3);
+      border-color: white;
+    }
+
+    /* Scroll indicator */
+    .scroll-indicator {
+      position: absolute;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      color: #64748b;
+      opacity: 0.8;
+      animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% {
+        transform: translateX(-50%) translateY(0);
+      }
+      40% {
+        transform: translateX(-50%) translateY(-10px);
+      }
+      60% {
+        transform: translateX(-50%) translateY(-5px);
+      }
+    }
+
+    .scroll-indicator svg {
+      width: 24px;
+      height: 24px;
     }
 
     /* Hero Section */
     .hero {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
+      background: white;
+      color: #2d3748;
       padding: 4rem 0 6rem 0;
       position: relative;
       overflow: hidden;
-    }
-
-    .hero::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
-      opacity: 0.3;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
     }
 
     .hero-content {
@@ -51,12 +265,15 @@
       font-size: 3.5rem;
       font-weight: 800;
       margin-bottom: 1rem;
-      text-shadow: 2px 4px 8px rgba(0, 0, 0, 0.2);
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
     .hero-subtitle {
       font-size: 1.5rem;
-      opacity: 0.9;
+      color: #64748b;
       margin-bottom: 2rem;
       font-weight: 300;
     }
@@ -74,34 +291,42 @@
     }
 
     .hero-stat {
-      background: rgba(255, 255, 255, 0.15);
-      backdrop-filter: blur(10px);
+      background: linear-gradient(135deg, #f8fafc, white);
+      border: 1px solid #e2e8f0;
       border-radius: 15px;
       padding: 1.5rem;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      transition: transform 0.3s ease;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
 
     .hero-stat:hover {
       transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
     }
 
     .hero-stat-value {
       font-size: 2.5rem;
       font-weight: 700;
       margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
     .hero-stat-label {
       font-size: 0.875rem;
-      opacity: 0.8;
+      color: #64748b;
       text-transform: uppercase;
       letter-spacing: 0.5px;
+      font-weight: 500;
     }
 
     /* Section Styling */
     .section {
       padding: 4rem 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
     }
 
     .section-content {
@@ -109,12 +334,19 @@
       margin: 0 auto;
       padding: 0 2rem;
     }
+    
+    /* Wider content for dashboard and map sections */
+    .dashboard-section .section-content,
+    .map-section .section-content {
+      max-width: 82%;
+      width: 82%;
+    }
 
     .section-title {
       font-size: 2.5rem;
       font-weight: 700;
       text-align: center;
-      margin-bottom: 1rem;
+      margin-bottom: 2rem;
       background: linear-gradient(135deg, #667eea, #764ba2);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
@@ -132,6 +364,7 @@
     .dashboard-section {
       background: white;
       border-top: 1px solid #e2e8f0;
+      padding-bottom: 5vh; /* Add bottom padding to prevent border touching */
     }
 
     .dashboard-wrapper {
@@ -139,11 +372,14 @@
       overflow: hidden;
       /* Isolate the iframe to prevent scroll propagation */
       isolation: isolate;
+      width: 100%;
+      height: 75vh;
+      margin: 0 auto;
     }
 
     .dashboard-frame {
       width: 100%;
-      height: 80vh;
+      height: 75vh;
       border: none;
       border-radius: 20px;
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
@@ -157,14 +393,20 @@
 
     /* Map Analysis Section */
     .map-section {
-      background: #f8fafc;
+      background: white;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding-top: 3vh;
+      padding-bottom: 8vh; /* Extra padding for heatmap */
     }
 
     .analysis-container {
       display: grid;
       grid-template-columns: 1fr 350px;
       gap: 2rem;
-      height: 90vh;
+      height: 80vh;
+      max-height: 800px;
     }
 
     .map-container {
@@ -187,6 +429,7 @@
       padding: 2rem;
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
       overflow-y: auto;
+      scroll-behavior: smooth;
     }
 
     .amenity-panel h3 {
@@ -200,78 +443,101 @@
     .amenity-list {
       display: flex;
       flex-direction: column;
-      gap: 0.75rem;
-    }
+      gap: 0.5rem;
+    } 
 
     .amenity-item {
-      padding: 1rem 1.25rem;
-      border-radius: 12px;
+      padding: 0.5rem 0.75rem;
+      border-radius: 8px;
       cursor: pointer;
-      transition: all 0.3s ease;
-      border: 2px solid transparent;
-      background: #f8fafc;
+      transition: all 0.2s ease;
+      border: 1px solid #e5e7eb;
+      background: #ffffff;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .amenity-item::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 0;
+      background: linear-gradient(90deg, #f3f4f6, #e5e7eb);
+      transition: width 0.2s ease;
+      z-index: 0;
     }
 
     .amenity-item:hover {
-      background: linear-gradient(135deg, #f7fafc, #edf2f7);
-      transform: translateY(-2px);
-      border-color: #e2e8f0;
+      border-color: #d1d5db;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .amenity-item:hover::before {
+      width: 100%;
     }
 
     .amenity-item.active {
-      background: linear-gradient(135deg, #667eea, #764ba2);
+      background: #111827;
       color: white;
-      transform: scale(1.02);
-      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+      border-color: #111827;
+      box-shadow: 0 2px 8px rgba(17, 24, 39, 0.15);
+    }
+
+    .amenity-item.active::before {
+      display: none;
+    }
+
+    .amenity-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      position: relative;
+      z-index: 1;
     }
 
     .amenity-name {
-      font-weight: 600;
-      font-size: 0.95rem;
+      font-weight: 500;
+      font-size: 0.875rem;
+      color: inherit;
+      letter-spacing: 0.01em;
     }
 
     .amenity-stats {
       display: flex;
       flex-direction: column;
       align-items: flex-end;
-      font-size: 0.875rem;
+      font-size: 0.75rem;
+      line-height: 1.2;
+      min-width: 60px;
     }
 
     .amenity-percentage {
-      font-weight: 700;
-      margin-bottom: 0.25rem;
-    }
-
-    .amenity-count {
-      opacity: 0.7;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 0.125rem;
       font-size: 0.8rem;
     }
 
+    .amenity-count {
+      color: #6b7280;
+      font-size: 0.7rem;
+      font-weight: 400;
+    }
+
+    .amenity-item.active .amenity-percentage {
+      color: #e5e7eb;
+    }
+
     .amenity-item.active .amenity-count {
-      opacity: 0.9;
+      color: #d1d5db;
     }
 
-    .clear-button {
-      width: 100%;
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      color: white;
-      border: none;
-      padding: 0.75rem 1.5rem;
-      border-radius: 12px;
-      font-weight: 600;
-      font-size: 0.95rem;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      margin-bottom: 1.5rem;
-    }
-
-    .clear-button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
-    }
 
     .loading-state {
       display: flex;
@@ -288,6 +554,12 @@
       color: white;
       text-align: center;
       padding: 2rem 0;
+      min-height: auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative; /* ensure z-index applies within stacking context */
+      z-index: 10100; /* place footer above the sidebar (sidebar z-index: 1000) */
     }
 
     .footer a {
@@ -303,6 +575,34 @@
 
     /* Responsive Design */
     @media (max-width: 1024px) {
+      .sidebar-nav {
+        transform: translateX(-100%);
+      }
+
+      .sidebar-nav.open {
+        transform: translateX(0);
+      }
+
+      .scroll-container {
+        margin-left: 0;
+      }
+
+      .section-nav {
+        right: 1rem;
+      }
+      
+      .nav-dot {
+        width: 10px;
+        height: 10px;
+      }
+      
+      /* Maintain wider content on tablets */
+      .dashboard-section .section-content,
+      .map-section .section-content {
+        max-width: 90%;
+        width: 90%;
+      }
+      
       .analysis-container {
         grid-template-columns: 1fr;
         height: auto;
@@ -319,6 +619,33 @@
     }
 
     @media (max-width: 768px) {
+      .sidebar-nav {
+        display: none; /* Hide sidebar on mobile */
+      }
+
+      .section-nav {
+        display: none; /* Hide navigation dots on mobile */
+      }
+      
+      .scroll-container {
+        margin-left: 0;
+        scroll-snap-type: none; /* Disable snap scrolling on mobile for better control */
+      }
+      
+      .scroll-section {
+        min-height: auto; /* Allow natural height on mobile */
+        scroll-snap-align: none;
+      }
+      
+      .hero {
+        min-height: 100vh; /* Keep hero full height */
+      }
+      
+      .section {
+        min-height: auto;
+        padding: 3rem 0;
+      }
+      
       .hero-title {
         font-size: 2.5rem;
       }
@@ -336,111 +663,336 @@
       }
 
       .dashboard-frame {
-        height: 70vh;
+        height: 60vh;
       }
-
+      
       .analysis-container {
         gap: 1rem;
+        height: auto;
       }
 
       .section-content {
         padding: 0 1rem;
+      }
+      
+      /* Full width on mobile for dashboard and map */
+      .dashboard-section .section-content,
+      .map-section .section-content {
+        max-width: 100%;
+        width: 100%;
+        padding: 0 0.5rem;
+      }
+      
+      .scroll-indicator {
+        display: none;
       }
     }
 
   </style>
 </head>
 <body>
-  <!-- Hero Section -->
-  <section class="hero">
-    <div class="hero-content">
-      <h1 class="hero-title">Visitation Analysis of Walker Johnston Park</h1>
-      <p class="hero-subtitle">A spatial and temporal view of visitor patterns based on anonymized mobile location data</p>
+  <!-- Left Sidebar Navigation -->
+  <nav class="sidebar-nav" id="sidebarNav">
+    <div class="sidebar-brand">
+      <button class="collapse-btn" id="collapseBtn" aria-label="Toggle sidebar" title="Toggle sidebar">
+        <!-- chevron icon -->
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <span class="brand-text">parkbeat</span>
+    </div>
+    <ul class="sidebar-links">
+      <li class="sidebar-link active" data-section="0">
+        <span class="sidebar-icon" aria-hidden="true">
+          <!-- home -->
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5L12 4l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-8.5z"/></svg>
+        </span>
+        <span class="sidebar-text">Home & About</span>
+      </li>
       
-      <div class="hero-stats">
-        <div class="hero-stat">
-          <div class="hero-stat-value">422K</div>
-          <div class="hero-stat-label">Total Pings</div>
-        </div>
-        <div class="hero-stat">
-          <div class="hero-stat-value">20.9K</div>
-          <div class="hero-stat-label">Unique Devices</div>
-        </div>
-        <div class="hero-stat">
-          <div class="hero-stat-value">33.6K</div>
-          <div class="hero-stat-label">Device Days</div>
-        </div>
-        <div class="hero-stat">
-          <div class="hero-stat-value">3.75</div>
-          <div class="hero-stat-label">Years Analyzed</div>
-        </div>
-      </div>
-    </div>
-  </section>
+      <!-- Visitor Analysis Category -->
+      <li style="padding: 0.75rem 1rem; color: #9ca3af; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 1rem;">
+        <span class="sidebar-text">Visitor Analysis</span>
+      </li>
+      <li class="sidebar-link" data-section="1">
+        <span class="sidebar-icon" aria-hidden="true">
+          <!-- chart -->
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14v4"/><path d="M12 10v8"/><path d="M17 6v12"/></svg>
+        </span>
+        <span class="sidebar-text">Data Snapshot</span>
+      </li>
+      <li class="sidebar-link" data-section="2">
+        <span class="sidebar-icon" aria-hidden="true">
+          <!-- clock -->
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+        </span>
+        <span class="sidebar-text">Visit Timing</span>
+      </li>
+      <li class="sidebar-link" data-section="3">
+        <span class="sidebar-icon" aria-hidden="true">
+          <!-- calendar -->
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </span>
+        <span class="sidebar-text">Weekly & Monthly</span>
+      </li>
+      <li class="sidebar-link" data-section="4">
+        <span class="sidebar-icon" aria-hidden="true">
+          <!-- users -->
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </span>
+        <span class="sidebar-text">Visitor Origins</span>
+      </li>
+      <li class="sidebar-link" data-section="5">
+        <span class="sidebar-icon" aria-hidden="true">
+          <!-- navigation -->
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="3,11 22,2 13,21 11,13 3,11"/></svg>
+        </span>
+        <span class="sidebar-text">Travel Distances</span>
+      </li>
+      <li class="sidebar-link" data-section="6">
+        <span class="sidebar-icon" aria-hidden="true">
+          <!-- bar-chart -->
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>
+        </span>
+        <span class="sidebar-text">Demographics</span>
+      </li>
+      <li class="sidebar-link" data-section="7">
+        <span class="sidebar-icon" aria-hidden="true">
+          <!-- map -->
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 3l-5 2-5-2-5 2v14l5-2 5 2 5-2V3z"/></svg>
+        </span>
+        <span class="sidebar-text">Amenity Heatmap</span>
+      </li>
+      <li class="sidebar-link" data-section="8">
+        <span class="sidebar-icon" aria-hidden="true">
+          <!-- location/pin -->
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        </span>
+        <span class="sidebar-text">Census Block Origins</span>
+      </li>
+    </ul>
+  </nav>
 
-  <!-- About Section -->
-  <section class="section" style="background: white;">
-    <div class="section-content">
-      <h2 class="section-title">About This Analysis</h2>
-      <div style="max-width: 800px; margin: 0 auto; text-align: left; line-height: 1.8; font-size: 1.1rem; color: #4a5568;">
-        <p style="margin-bottom: 1.5rem;">📍 <strong>Walker Johnston Park | Urbandale, Iowa</strong></p>
-        <p style="margin-bottom: 1.5rem;">This analysis uses anonymized and aggregated mobile location data covering <strong>January 1, 2022 through August 30, 2025</strong> at Walker Johnston Park.</p>
-        <p style="margin-bottom: 1.5rem;">The dataset provides insights into visitor behavior patterns and may include bias depending on smartphone ownership and location-sharing preferences among different user groups.</p>
-        <p>A special filter was applied to identify devices spending at least <strong>15 minutes in the baseball field area</strong>, enabling separate analysis of baseball field visits, non-baseball field visits, and all park visits.</p>
-      </div>
-    </div>
-  </section>
+  <!-- Section Navigation Dots -->
+  <nav class="section-nav">
+    <div class="nav-dot active" data-section="0" title="Home &amp; About"></div>
+    <div class="nav-dot" data-section="1" title="Data Snapshot"></div>
+    <div class="nav-dot" data-section="2" title="Visit Timing"></div>
+    <div class="nav-dot" data-section="3" title="Weekly &amp; Monthly"></div>
+    <div class="nav-dot" data-section="4" title="Visitor Origins"></div>
+    <div class="nav-dot" data-section="5" title="Travel Distances"></div>
+    <div class="nav-dot" data-section="6" title="Demographics"></div>
+    <div class="nav-dot" data-section="7" title="Amenity Heatmap"></div>
+    <div class="nav-dot" data-section="8" title="Census Block Origins"></div>
+  </nav>
 
-  <!-- Methods Section -->
-  <section class="section" style="background: #f8fafc;">
-    <div class="section-content">
-      <h2 class="section-title">Data Cleaning & Processing</h2>
-      <div style="max-width: 800px; margin: 0 auto;">
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-top: 2rem;">
-          <div style="background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
-            <h3 style="color: #667eea; margin-bottom: 1rem; font-size: 1.2rem;">🧹 Data Cleaning</h3>
-            <ul style="list-style: none; padding: 0; line-height: 1.6;">
-              <li style="margin-bottom: 0.5rem;">• Removed duplicate location pings</li>
-              <li style="margin-bottom: 0.5rem;">• Filtered out pass-through traffic (devices staying less than 15 minutes)</li>
-            </ul>
+  <!-- Scroll Container -->
+  <div class="scroll-container" id="scrollContainer">
+    <!-- Combined Home & About Section -->
+    <section class="hero scroll-section">
+      <div class="hero-content">
+        <h1 class="hero-title">Visitation Analysis of Walker Johnston Park</h1>
+        <p class="hero-subtitle">A spatial and temporal view of visitor patterns based on anonymized mobile location data</p>
+        
+        <div class="hero-stats">
+          <div class="hero-stat">
+            <div class="hero-stat-value">422K</div>
+            <div class="hero-stat-label">Total Pings</div>
           </div>
-          <div style="background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
-            <h3 style="color: #667eea; margin-bottom: 1rem; font-size: 1.2rem;">🎯 Quality Filters</h3>
-            <ul style="list-style: none; padding: 0; line-height: 1.6;">
-              <li style="margin-bottom: 0.5rem;">• Excluded likely residents and employees (frequent evening/daytime presence within 200 meters)</li>
-              <li style="margin-bottom: 0.5rem;">• Applied additional proprietary techniques to improve visit accuracy</li>
-            </ul>
+          <div class="hero-stat">
+            <div class="hero-stat-value">20.9K</div>
+            <div class="hero-stat-label">Unique Devices</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-value">33.6K</div>
+            <div class="hero-stat-label">Device Days</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-value">3.75</div>
+            <div class="hero-stat-label">Years Analyzed</div>
+          </div>
+        </div>
+
+        <!-- About This Analysis Content -->
+        <div style="max-width: 900px; margin: 4rem auto 0 auto;">
+          <!-- About content -->
+          <div style="text-align: left; line-height: 1.8; font-size: 1.1rem; color: #4a5568; margin-bottom: 3rem;">
+            <p style="margin-bottom: 1.5rem;">📍 <strong>Walker Johnston Park | Urbandale, Iowa</strong></p>
+            <p style="margin-bottom: 1.5rem;">This analysis uses anonymized and aggregated mobile location data covering <strong>January 1, 2022 through August 30, 2025</strong> at Walker Johnston Park.</p>
+            <p style="margin-bottom: 1.5rem;">The dataset provides insights into visitor behavior patterns and may include bias depending on smartphone ownership and location-sharing preferences among different user groups.</p>
+            <p>A special filter was applied to identify devices spending at least <strong>15 minutes in the baseball field area</strong>, enabling separate analysis of baseball field visits, non-baseball field visits, and all park visits.</p>
+          </div>
+          
+          <!-- Data Processing content -->
+          <h3 style="text-align: center; font-size: 1.8rem; font-weight: 600; margin-bottom: 2rem; color: #2d3748;">Data Processing Methodology</h3>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+            <div style="background: #f8fafc; padding: 1.5rem; border-radius: 12px; border: 1px solid #e2e8f0;">
+              <h4 style="color: #667eea; margin-bottom: 1rem; font-size: 1.2rem;">Data Cleaning</h4>
+              <ul style="list-style: none; padding: 0; line-height: 1.6;">
+                <li style="margin-bottom: 0.5rem;">• Removed duplicate location pings</li>
+                <li style="margin-bottom: 0.5rem;">• Filtered out pass-through traffic (devices staying less than 15 minutes)</li>
+              </ul>
+            </div>
+            <div style="background: #f8fafc; padding: 1.5rem; border-radius: 12px; border: 1px solid #e2e8f0;">
+              <h4 style="color: #667eea; margin-bottom: 1rem; font-size: 1.2rem;">Quality Filters</h4>
+              <ul style="list-style: none; padding: 0; line-height: 1.6;">
+                <li style="margin-bottom: 0.5rem;">• Excluded likely residents and employees (frequent evening/daytime presence within 200 meters)</li>
+                <li style="margin-bottom: 0.5rem;">• Applied additional proprietary techniques to improve visit accuracy</li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </section>
+      <!-- Scroll Indicator -->
+      <div class="scroll-indicator">
+        <span style="font-size: 0.875rem; text-transform: uppercase; letter-spacing: 1px;">Scroll Down</span>
+        <svg fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+        </svg>
+      </div>
+    </section>
 
-  <!-- Dashboard Section -->
-  <section class="section dashboard-section" id="dashboard">
+  <!-- Data Snapshot Dashboard -->
+  <section class="section dashboard-section scroll-section" id="dashboard-snapshot">
     <div class="section-content">
-      <h2 class="section-title">Interactive Dashboard</h2>
-      <p class="section-subtitle">Detailed analytics and key performance indicators</p>
+      <h2 class="section-title">Data Snapshot</h2>
       
-      <div class="dashboard-wrapper" style="position: relative; overflow: hidden;">
+      <p style="text-align: center; color: #64748b; font-size: 0.9rem; margin: 0 auto 0.5rem auto; max-width: 800px;"><strong>Scale and Source:</strong> Number of mobile location records (pings) collected from Jan 1, 2022 to Aug 30, 2025. "Unique Devices" = distinct devices; "Device Days" = days those devices were observed at sites.</p>
+      
+      <div class="dashboard-wrapper">
         <iframe 
           class="dashboard-frame"
-          src="https://lookerstudio.google.com/embed/reporting/e5bb20c8-ec05-4411-95b0-54f3f8a7447b/page/p_ftpwxmqptd"
+          id="dashboardFrameSnapshot"
+          src="https://lookerstudio.google.com/embed/reporting/8886b411-25b7-4020-835c-b5325ba82b18/page/tEnnC"
           style="border:0;"
           allowfullscreen
           tabindex="-1"
           scrolling="no"
-          sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-presentation">
+          sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-presentation"
+          loading="lazy">
+        </iframe>
+      </div>
+    </div>
+  </section>
+
+  <!-- Visit Timing Dashboard -->
+  <section class="section dashboard-section scroll-section" id="dashboard-timing">
+    <div class="section-content">
+      <h2 class="section-title">Visit Timing</h2>
+      
+      <p style="text-align: center; color: #64748b; font-size: 0.9rem; margin: 0 auto 0.5rem auto; max-width: 800px;"><strong>Hourly & Dwell Time:</strong> Device counts by hour of day. Each hour shown only if a ping occurred in that period. Dwell time = time between entry and exit; some errors possible (e.g., drop-offs and returns).</p>
+      
+      <div class="dashboard-wrapper">
+        <iframe 
+          class="dashboard-frame"
+          id="dashboardFrameTiming"
+          src="https://lookerstudio.google.com/embed/reporting/8886b411-25b7-4020-835c-b5325ba82b18/page/p_vhb4s6lptd"
+          style="border:0;"
+          allowfullscreen
+          tabindex="-1"
+          scrolling="no"
+          sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-presentation"
+          loading="lazy">
+        </iframe>
+      </div>
+    </div>
+  </section>
+
+  <!-- Weekly and Monthly Patterns Dashboard -->
+  <section class="section dashboard-section scroll-section" id="dashboard-patterns">
+    <div class="section-content">
+      <h2 class="section-title">Weekly & Monthly Patterns</h2>
+      
+      <p style="text-align: center; color: #64748b; font-size: 0.9rem; margin: 0 auto 0.5rem auto; max-width: 800px;"><strong>Weekly and Monthly Patterns:</strong> Devices by day of week and by month. Reflects data collection timing; day-of-week more reliable, monthly trends require comparison to observed counts.</p>
+      
+      <div class="dashboard-wrapper">
+        <iframe 
+          class="dashboard-frame"
+          id="dashboardFramePatterns"
+          src="https://lookerstudio.google.com/embed/reporting/8886b411-25b7-4020-835c-b5325ba82b18/page/p_0mitkcmptd"
+          style="border:0;"
+          allowfullscreen
+          tabindex="-1"
+          scrolling="no"
+          sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-presentation"
+          loading="lazy">
+        </iframe>
+      </div>
+    </div>
+  </section>
+
+  <!-- Visitor Origins Dashboard -->
+  <section class="section dashboard-section scroll-section" id="dashboard-origins">
+    <div class="section-content">
+      <h2 class="section-title">Visitor Origins</h2>
+      
+      <p style="text-align: center; color: #64748b; font-size: 0.9rem; margin: 0 auto 0.5rem auto; max-width: 800px;"><strong>Visitor Origins:</strong> Home county of visiting devices based on evening location. Devices visiting on multiple days counted each time (visit-days).</p>
+      
+      <div class="dashboard-wrapper">
+        <iframe 
+          class="dashboard-frame"
+          id="dashboardFrameOrigins"
+          src="https://lookerstudio.google.com/embed/reporting/8886b411-25b7-4020-835c-b5325ba82b18/page/p_m5qmiqqptd"
+          style="border:0;"
+          allowfullscreen
+          tabindex="-1"
+          scrolling="no"
+          sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-presentation"
+          loading="lazy">
+        </iframe>
+      </div>
+    </div>
+  </section>
+
+  <!-- Travel Distances Dashboard -->
+  <section class="section dashboard-section scroll-section" id="dashboard-distances">
+    <div class="section-content">
+      <h2 class="section-title">Travel Distances</h2>
+      
+      <p style="text-align: center; color: #64748b; font-size: 0.9rem; margin: 0 auto 0.5rem auto; max-width: 800px;"><strong>Travel Distances:</strong> Average travel distance per visit and per unique visitor. Distances reported as straight-line ("as the crow flies").</p>
+      
+      <div class="dashboard-wrapper">
+        <iframe 
+          class="dashboard-frame"
+          id="dashboardFrameDistances"
+          src="https://lookerstudio.google.com/embed/reporting/8886b411-25b7-4020-835c-b5325ba82b18/page/p_rbqve7tptd"
+          style="border:0;"
+          allowfullscreen
+          tabindex="-1"
+          scrolling="no"
+          sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-presentation"
+          loading="lazy">
+        </iframe>
+      </div>
+    </div>
+  </section>
+
+  <!-- Visitor Demographics Dashboard -->
+  <section class="section dashboard-section scroll-section" id="dashboard-demographics">
+    <div class="section-content">
+      <h2 class="section-title">Visitor Demographics</h2>
+      
+      <p style="text-align: center; color: #64748b; font-size: 0.9rem; margin: 0 auto 0.5rem auto; max-width: 800px;"><strong>Demographics:</strong> Demographic profile of visitors based on census tracts where devices are most often located in the evening.</p>
+      
+      <div class="dashboard-wrapper">
+        <iframe 
+          class="dashboard-frame"
+          id="dashboardFrameDemographics"
+          src="https://lookerstudio.google.com/embed/reporting/8886b411-25b7-4020-835c-b5325ba82b18/page/p_zqr88t4ptd"
+          style="border:0;"
+          allowfullscreen
+          tabindex="-1"
+          scrolling="no"
+          sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-presentation"
+          loading="lazy">
         </iframe>
       </div>
     </div>
   </section>
 
   <!-- Map Analysis Section -->
-  <section class="section map-section">
+  <section class="section map-section scroll-section">
     <div class="section-content">
       <h2 class="section-title">Amenity Usage Heatmap</h2>
-      <p class="section-subtitle">Explore visitor patterns across different park amenities</p>
       
       <div class="analysis-container">
         <div class="map-container">
@@ -448,9 +1000,26 @@
         </div>
         
         <div class="amenity-panel">
-          <button id="clearBtn" class="clear-button">Clear Selection</button>
           <h3>Park Amenities</h3>
           <div id="amenityList" class="amenity-list loading-state">(Loading amenities...)</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Census Block Origins Section -->
+  <section class="section map-section scroll-section">
+    <div class="section-content">
+      <h2 class="section-title">Census Block Origins</h2>
+      
+      <div class="analysis-container">
+        <div class="map-container">
+          <iframe id="censusMapFrame" src="device_census_map.html"></iframe>
+        </div>
+        
+        <div class="amenity-panel">
+          <h3>Top 20 Census Blocks</h3>
+          <div id="censusBlockList" class="amenity-list loading-state">(Loading census blocks...)</div>
         </div>
       </div>
     </div>
@@ -459,31 +1028,37 @@
   <!-- Footer -->
   <footer class="footer">
     <p>
-      Walker Johnston Park Data Analysis © 2025
+      Radbridge Incorporated © 2025
     </p>
   </footer>
+  </div> <!-- End scroll container -->
 
   <script>
     const selected = new Set();
     let receivedAmenities = false;
 
-    function sendHighlight(mapFrame) {
+    function sendHighlight() {
+      const mapFrame = document.getElementById("mapFrame");
+      if (!mapFrame || !mapFrame.contentWindow) {
+        console.error("❌ mapFrame not found or not loaded");
+        return;
+      }
+      
       if (selected.size > 0) {
         const amenities = Array.from(selected);
-        console.log("📤 Sending highlightAmenities:", amenities.length, "selected");
-        mapFrame.postMessage({ type: "highlightAmenities", amenities }, "*");
+        console.log("📤 Sending highlightAmenities:", amenities.length, "selected", amenities);
+        mapFrame.contentWindow.postMessage({ type: "highlightAmenities", amenities }, "*");
       } else {
         console.log("📤 Sending clearHighlight");
-        mapFrame.postMessage({ type: "clearHighlight" }, "*");
+        mapFrame.contentWindow.postMessage({ type: "clearHighlight" }, "*");
       }
     }
 
-    function renderAmenityList(amenities) {
+    function renderAmenityList(amenities, amenityStats = null) {
       const listDiv = document.getElementById("amenityList");
       listDiv.innerHTML = "";
       listDiv.classList.remove("loading-state");
 
-      const mapFrame = document.getElementById("mapFrame").contentWindow;
 
       // Human readable crosswalk (keeps keys identical to back-end codes)
       const AMENITY_NAMES_LONG = {
@@ -510,46 +1085,113 @@
         "wooden_boardwalk": "Wooden Boardwalk",
       };
 
-      amenities.forEach((amenityCode, index) => {
-        const div = document.createElement("div");
-        div.className = "amenity-item";
-        // store the original code so we can send it back when highlighting
-        div.dataset.code = String(amenityCode);
+      // Calculate total pings and amenity statistics if not provided
+      if (!amenityStats) {
+        amenityStats = { total: 0, amenities: {} };
+        
+        // Request amenity statistics from the map iframe
+        const mapFrame = document.getElementById("mapFrame");
+        if (mapFrame && mapFrame.contentWindow) {
+          mapFrame.contentWindow.postMessage({ type: "requestAmenityStats" }, "*");
+        }
+        
+        // For now, render without stats and update when received
+        amenities.forEach((amenityCode, index) => {
+          const div = document.createElement("div");
+          div.className = "amenity-item";
+          div.dataset.code = String(amenityCode);
 
-        const humanName = AMENITY_NAMES_LONG[amenityCode] || amenityCode;
-        div.innerHTML = `
-          <div class="amenity-name">${humanName}</div>
-        `;
+          const humanName = AMENITY_NAMES_LONG[amenityCode] || amenityCode;
+          div.innerHTML = `
+            <div class="amenity-content">
+              <div class="amenity-name">${humanName}</div>
+              <div class="amenity-stats">
+                <div class="amenity-percentage">--</div>
+                <div class="amenity-count">Loading...</div>
+              </div>
+            </div>
+          `;
 
-        // Animation removed
+          div.addEventListener("click", () => {
+            const amenityKey = div.dataset.code;
+            const isActive = selected.has(amenityKey);
+            selected.clear();
+            document.querySelectorAll(".amenity-item").forEach(el => el.classList.remove("active"));
 
-        div.addEventListener("click", () => {
-          // Use stored code for selection and messaging
-          const amenityKey = div.dataset.code;
-          const isActive = selected.has(amenityKey);
-          selected.clear();
-          document.querySelectorAll(".amenity-item").forEach(el => el.classList.remove("active"));
+            if (!isActive) {
+              selected.add(amenityKey);
+              div.classList.add("active");
+              
+              // Scroll the clicked item into view within the amenity panel
+              div.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'nearest',
+                inline: 'nearest'
+              });
+            }
 
-          if (!isActive) {
-            selected.add(amenityKey);
-            div.classList.add("active");
-          }
+            sendHighlight();
+          });
 
-          sendHighlight(mapFrame);
+          listDiv.appendChild(div);
+        });
+      } else {
+        // Sort amenities by ping count (descending)
+        const sortedAmenities = amenities.sort((a, b) => {
+          const countA = amenityStats.amenities[a] || 0;
+          const countB = amenityStats.amenities[b] || 0;
+          return countB - countA;
         });
 
-        listDiv.appendChild(div);
-      });
+        sortedAmenities.forEach((amenityCode, index) => {
+          const div = document.createElement("div");
+          div.className = "amenity-item";
+          div.dataset.code = String(amenityCode);
 
-      // Clear button functionality
-      document.getElementById("clearBtn").addEventListener("click", () => {
-        selected.clear();
-        document.querySelectorAll(".amenity-item").forEach(el => el.classList.remove("active"));
-        mapFrame.postMessage({ type: "clearHighlight" }, "*");
-      });
+          const humanName = AMENITY_NAMES_LONG[amenityCode] || amenityCode;
+          const count = amenityStats.amenities[amenityCode] || 0;
+          const percentage = amenityStats.total > 0 ? (count / amenityStats.total * 100) : 0;
+          
+          div.innerHTML = `
+            <div class="amenity-content">
+              <div class="amenity-name">${humanName}</div>
+              <div class="amenity-stats">
+                <div class="amenity-percentage">${percentage.toFixed(1)}%</div>
+                <div class="amenity-count">${count.toLocaleString()} pings</div>
+              </div>
+            </div>
+          `;
+
+          div.addEventListener("click", () => {
+            const amenityKey = div.dataset.code;
+            const isActive = selected.has(amenityKey);
+            selected.clear();
+            document.querySelectorAll(".amenity-item").forEach(el => el.classList.remove("active"));
+
+            if (!isActive) {
+              selected.add(amenityKey);
+              div.classList.add("active");
+              
+              // Scroll the clicked item into view within the amenity panel
+              div.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'nearest',
+                inline: 'nearest'
+              });
+            }
+
+            sendHighlight();
+          });
+
+          listDiv.appendChild(div);
+        });
+      }
+
     }
 
-    // Listen for amenity list from the iframe
+    // Listen for amenity list and statistics from the iframe
+    let amenityStatsData = null;
+    
     window.addEventListener("message", (event) => {
       const data = event.data;
       if (!data || !data.type) return;
@@ -557,8 +1199,28 @@
       if (data.type === "amenityList") {
         receivedAmenities = true;
         const amenities = (data.amenities || []).map(String).sort();
-        renderAmenityList(amenities);
+        renderAmenityList(amenities, amenityStatsData);
         console.log("✅ Received amenityList:", amenities.length);
+      }
+      
+      if (data.type === "amenityStats") {
+        amenityStatsData = data.stats;
+        console.log("✅ Received amenityStats:", amenityStatsData);
+        
+        // If we already have the amenity list, re-render with stats
+        if (receivedAmenities) {
+          const currentAmenities = Array.from(document.querySelectorAll('.amenity-item')).map(el => el.dataset.code);
+          if (currentAmenities.length > 0) {
+            renderAmenityList(currentAmenities, amenityStatsData);
+          }
+        }
+      }
+      
+      if (data.type === "censusBlockList") {
+        receivedCensusBlocks = true;
+        const blocks = data.blocks || [];
+        renderCensusBlockList(blocks);
+        console.log("✅ Received censusBlockList:", blocks.length);
       }
     });
 
@@ -595,78 +1257,757 @@
       }, retryMs);
     });
 
-    // Aggressive scroll prevention for iframe interactions
+    // Census Block List functionality
+    const selectedCensusBlocks = new Set();
+    let receivedCensusBlocks = false;
+
+    function sendCensusHighlight(censusMapFrame) {
+      if (selectedCensusBlocks.size > 0) {
+        const blocks = Array.from(selectedCensusBlocks);
+        console.log("📤 Sending highlightCensusBlocks:", blocks.length, "selected");
+        censusMapFrame.postMessage({ type: "highlightCensusBlocks", blocks }, "*");
+      } else {
+        console.log("📤 Sending clearHighlight");
+        censusMapFrame.postMessage({ type: "clearHighlight" }, "*");
+      }
+    }
+
+    function renderCensusBlockList(blocks) {
+      const listDiv = document.getElementById("censusBlockList");
+      listDiv.innerHTML = "";
+      listDiv.classList.remove("loading-state");
+
+      const censusMapFrame = document.getElementById("censusMapFrame").contentWindow;
+
+      // Sort blocks by device count (they should already be sorted from the data)
+      blocks.forEach((block, index) => {
+        const div = document.createElement("div");
+        div.className = "amenity-item";
+        div.dataset.geoid = block.GEOID;
+
+        div.innerHTML = `
+          <div class="amenity-content">
+            <div class="amenity-name">Block Group ${block.GEOID}</div>
+            <div class="amenity-stats">
+              <div class="amenity-percentage">${block.percentage}%</div>
+              <div class="amenity-count">${block.unique_devices.toLocaleString()} devices</div>
+            </div>
+          </div>
+        `;
+
+        div.addEventListener("click", () => {
+          const blockId = div.dataset.geoid;
+          const isActive = selectedCensusBlocks.has(blockId);
+          selectedCensusBlocks.clear();
+          document.querySelectorAll("#censusBlockList .amenity-item").forEach(el => el.classList.remove("active"));
+
+          if (!isActive) {
+            selectedCensusBlocks.add(blockId);
+            div.classList.add("active");
+            
+            // Scroll the clicked item into view within the panel
+            div.scrollIntoView({ 
+              behavior: 'smooth', 
+              block: 'nearest',
+              inline: 'nearest'
+            });
+          }
+
+          sendCensusHighlight(censusMapFrame);
+        });
+
+        listDiv.appendChild(div);
+      });
+    }
+
+    // Request census blocks from the census map iframe once it is loaded
+    window.addEventListener("load", () => {
+      const censusFrame = document.getElementById("censusMapFrame");
+      if (censusFrame) {
+        const censusTargetWindow = censusFrame.contentWindow;
+        const censusStart = Date.now();
+        const censusRetryMs = 300;
+        const censusTimeoutMs = 8000;
+
+        const censusIntervalId = setInterval(() => {
+          if (receivedCensusBlocks) {
+            clearInterval(censusIntervalId);
+            return;
+          }
+
+          try {
+            censusTargetWindow.postMessage({ type: "requestCensusBlocks" }, "*");
+            console.log("↗️ Requested census blocks from census map iframe");
+          } catch (e) {
+            console.warn("PostMessage to census map failed (retrying)", e);
+          }
+
+          if (Date.now() - censusStart > censusTimeoutMs) {
+            clearInterval(censusIntervalId);
+            if (!receivedCensusBlocks) {
+              const listDiv = document.getElementById("censusBlockList");
+              listDiv.textContent = "Census blocks unavailable - please refresh the page.";
+              listDiv.style.color = "#e53e3e";
+              console.error("❌ Timed out waiting for censusBlockList");
+            }
+          }
+        }, censusRetryMs);
+      }
+    });
+
+    // Section-based scrolling functionality
     (function() {
-      let scrollLocked = false;
-      let lastScrollY = window.pageYOffset;
+      // Sidebar collapse handling
+      const sidebar = document.getElementById('sidebarNav');
+      const collapseBtn = document.getElementById('collapseBtn');
+
+      function setCollapsed(collapsed) {
+        if (collapsed) {
+          sidebar.classList.add('collapsed');
+          document.querySelector('.scroll-container').style.marginLeft = '56px';
+          collapseBtn.setAttribute('aria-expanded', 'false');
+          // When collapsed, chevron points right (expand direction)
+          collapseBtn.querySelector('svg path').setAttribute('d', 'M9 18l6-6-6-6');
+        } else {
+          sidebar.classList.remove('collapsed');
+          document.querySelector('.scroll-container').style.marginLeft = '180px';
+          collapseBtn.setAttribute('aria-expanded', 'true');
+          // When expanded, chevron points left (collapse direction)
+          collapseBtn.querySelector('svg path').setAttribute('d', 'M15 18l-6-6 6-6');
+        }
+        try { localStorage.setItem('sidebarCollapsed', collapsed ? '1' : '0'); } catch (e) { /* ignore */ }
+      }
+
+      // Initialize collapse state from localStorage
+      try {
+        const saved = localStorage.getItem('sidebarCollapsed');
+        setCollapsed(saved === '1');
+      } catch (e) {
+        setCollapsed(false);
+      }
+
+      collapseBtn.addEventListener('click', (e) => {
+        const isCollapsed = sidebar.classList.contains('collapsed');
+        setCollapsed(!isCollapsed);
+      });
+
+      const scrollContainer = document.getElementById('scrollContainer');
+      const sections = document.querySelectorAll('.scroll-section');
+      const navDots = document.querySelectorAll('.nav-dot');
+      const sidebarLinks = document.querySelectorAll('.sidebar-link');
+      let currentSection = 0;
+      let isScrolling = false;
       
-      // Lock scroll position when hovering over or focusing on the dashboard iframe
-      const dashboardWrapper = document.querySelector('.dashboard-wrapper');
-      const dashboardFrame = document.querySelector('.dashboard-frame');
+      // Debug: Log section information
+      console.log('🔍 Section mapping:');
+      sections.forEach((section, index) => {
+        const title = section.querySelector('.section-title');
+        const sectionName = title ? title.textContent : section.className;
+        console.log(`  ${index}: ${sectionName} - ${section.className}`);
+      });
       
-      if (dashboardWrapper && dashboardFrame) {
-        // Prevent scroll when interacting with iframe
+      // Update active navigation dot and sidebar
+      function updateNavigation(index) {
+        navDots.forEach((dot, i) => {
+          dot.classList.toggle('active', i === index);
+        });
+        sidebarLinks.forEach((link, i) => {
+          link.classList.toggle('active', i === index);
+        });
+      }
+      
+      // Scroll to specific section
+      function scrollToSection(index) {
+        if (index >= 0 && index < sections.length && !isScrolling) {
+          isScrolling = true;
+          currentSection = index;
+          updateNavigation(index);
+          
+          const targetSection = sections[index];
+          const title = targetSection.querySelector('.section-title');
+          console.log(`📍 Scrolling to section ${index}: ${title ? title.textContent : 'Unknown'}`);
+          
+          sections[index].scrollIntoView({ behavior: 'smooth', block: 'start' });
+          
+          // Reset scrolling flag after animation
+          setTimeout(() => {
+            isScrolling = false;
+          }, 1000);
+        }
+      }
+      
+      // Handle navigation dot clicks
+      navDots.forEach((dot, index) => {
+        dot.addEventListener('click', () => {
+          scrollToSection(index);
+        });
+      });
+      
+      // Handle sidebar link clicks
+      sidebarLinks.forEach((link, index) => {
+        link.addEventListener('click', () => {
+          scrollToSection(index);
+        });
+      });
+      
+      // Handle scroll events with debouncing
+      let scrollTimeout;
+      scrollContainer.addEventListener('scroll', () => {
+        if (!isScrolling) {
+          clearTimeout(scrollTimeout);
+          scrollTimeout = setTimeout(() => {
+            const scrollTop = scrollContainer.scrollTop;
+            const containerHeight = scrollContainer.clientHeight;
+            
+            // Find current section based on scroll position
+            sections.forEach((section, index) => {
+              const rect = section.getBoundingClientRect();
+              const sectionTop = section.offsetTop;
+              
+              if (scrollTop >= sectionTop - containerHeight / 2 && 
+                  scrollTop < sectionTop + section.offsetHeight - containerHeight / 2) {
+                if (currentSection !== index) {
+                  currentSection = index;
+                  updateNavigation(index);
+                }
+              }
+            });
+          }, 100);
+        }
+      });
+      
+      // Handle keyboard navigation
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowDown' || e.key === 'PageDown') {
+          e.preventDefault();
+          scrollToSection(currentSection + 1);
+        } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
+          e.preventDefault();
+          scrollToSection(currentSection - 1);
+        } else if (e.key === 'Home') {
+          e.preventDefault();
+          scrollToSection(0);
+        } else if (e.key === 'End') {
+          e.preventDefault();
+          scrollToSection(sections.length - 1);
+        }
+      });
+      
+      // Mouse wheel handling with section snapping
+      let wheelTimeout;
+      let wheelDelta = 0;
+      let isOverIframe = false;
+      
+      // Detect when mouse is over any dashboard or map iframes or amenity panel
+      const allDashboardWrappers = document.querySelectorAll('.dashboard-wrapper');
+      const mapContainers = document.querySelectorAll('.map-container');
+      const amenityPanels = document.querySelectorAll('.amenity-panel');
+      
+      allDashboardWrappers.forEach(dashboardWrapper => {
         dashboardWrapper.addEventListener('mouseenter', () => {
-          scrollLocked = true;
-          lastScrollY = window.pageYOffset;
+          isOverIframe = true;
         });
-        
         dashboardWrapper.addEventListener('mouseleave', () => {
-          scrollLocked = false;
+          isOverIframe = false;
         });
-        
-        // Block scroll events during iframe interaction
-        window.addEventListener('scroll', (e) => {
-          if (scrollLocked) {
-            window.scrollTo(0, lastScrollY);
+      });
+      
+      mapContainers.forEach(mapContainer => {
+        mapContainer.addEventListener('mouseenter', () => {
+          isOverIframe = true;
+        });
+        mapContainer.addEventListener('mouseleave', () => {
+          isOverIframe = false;
+        });
+      });
+      
+      amenityPanels.forEach(amenityPanel => {
+        amenityPanel.addEventListener('mouseenter', () => {
+          isOverIframe = true;
+        });
+        amenityPanel.addEventListener('mouseleave', () => {
+          isOverIframe = false;
+        });
+      });
+      
+      // Wheel event handling disabled to prevent scroll jumping
+      // scrollContainer.addEventListener('wheel', (e) => {
+      //   // Don't prevent default if over iframe to allow iframe scrolling
+      //   if (!isOverIframe) {
+      //     e.preventDefault();
+      //     
+      //     wheelDelta += e.deltaY;
+      //     
+      //     clearTimeout(wheelTimeout);
+      //     wheelTimeout = setTimeout(() => {
+      //       if (Math.abs(wheelDelta) > 30) { // Reduced threshold for more responsive scrolling
+      //         if (wheelDelta > 0) {
+      //           scrollToSection(currentSection + 1);
+      //         } else {
+      //           scrollToSection(currentSection - 1);
+      //         }
+      //       }
+      //       wheelDelta = 0;
+      //     }, 100); // Increased timeout for less jumpy behavior
+      //   }
+      // }, { passive: false });
+      
+      // Hide scroll indicator when not on first section
+      const scrollIndicator = document.querySelector('.scroll-indicator');
+      if (scrollIndicator) {
+        scrollContainer.addEventListener('scroll', () => {
+          const opacity = Math.max(0, 1 - (scrollContainer.scrollTop / 200));
+          scrollIndicator.style.opacity = opacity;
+        });
+      }
+      
+      // Additional iframe protection with hack for all dashboard and map sections
+      const allDashboardFrames = document.querySelectorAll('.dashboard-frame');
+      const mapFrame = document.querySelector('#mapFrame');
+      const censusMapFrame = document.querySelector('#censusMapFrame');
+      const dashboardSections = document.querySelectorAll('.dashboard-section');
+      const mapSections = document.querySelectorAll('.map-section');
+      let dashboardSectionIndices = [];
+      let mapSectionIndices = [];
+      
+      // Find all dashboard and map section indices
+      sections.forEach((section, index) => {
+        if (section.classList.contains('dashboard-section')) {
+          dashboardSectionIndices.push(index);
+        }
+        if (section.classList.contains('map-section')) {
+          mapSectionIndices.push(index);
+        }
+      });
+      
+      // Prevent focus-based scrolling on all iframes
+      [...allDashboardFrames, mapFrame, censusMapFrame].forEach(frame => {
+        if (frame) {
+          // Block focus events that might cause scrolling
+          frame.addEventListener('focus', (e) => {
             e.preventDefault();
             e.stopPropagation();
-            return false;
-          }
-        }, { passive: false });
+          }, true);
+          
+          // Monitor iframe load events
+          frame.addEventListener('load', () => {
+            // NOTE: iframe load previously forced scrolls back to sections which caused
+            // janky automatic scrolling on page open. Intentionally avoid calling
+            // `scrollToSection` here to prevent the parent page from being moved by
+            // iframe-internal navigation or focus changes. Keep a lightweight log
+            // for debugging only.
+            try {
+              console.log('iframe loaded:', frame && frame.id ? frame.id : frame);
+            } catch (e) {
+              // swallow logging errors
+            }
+          });
+        }
+      });
+      
+      // Enhanced debugging for dashboard interactions - apply to all dashboard sections
+      const dashboardWrappers = document.querySelectorAll('.dashboard-wrapper');
+      const dashboardFrames = document.querySelectorAll('.dashboard-frame');
+      
+      if (dashboardWrappers.length > 0) {
+        console.log('🔧 Setting up enhanced dashboard scroll debugging');
+        let lastScrollTime = 0;
+        let scrollEventCount = 0;
         
-        // Prevent focus-based scrolling
-        dashboardFrame.addEventListener('focus', (e) => {
-          e.preventDefault();
-          const currentScroll = window.pageYOffset;
-          setTimeout(() => {
-            window.scrollTo(0, currentScroll);
-          }, 0);
+        // Create debug panel
+        const debugPanel = document.createElement('div');
+        debugPanel.style.cssText = `
+          position: fixed;
+          top: 10px;
+          left: 10px;
+          background: rgba(0,0,0,0.8);
+          color: white;
+          padding: 10px;
+          font-family: monospace;
+          font-size: 12px;
+          z-index: 10000;
+          max-width: 400px;
+          border-radius: 5px;
+          display: none;
+        `;
+        document.body.appendChild(debugPanel);
+        
+        // Toggle debug panel with Ctrl+D
+        document.addEventListener('keydown', (e) => {
+          if (e.ctrlKey && e.key === 'd') {
+            e.preventDefault();
+            debugPanel.style.display = debugPanel.style.display === 'none' ? 'block' : 'none';
+          }
         });
         
-        // Intercept and block any scroll attempts from iframe
-        dashboardFrame.addEventListener('load', () => {
-          try {
-            // Save current scroll position before iframe loads
-            const scrollBefore = window.pageYOffset;
-            
-            // Restore scroll position after a brief delay
+        function updateDebug(info) {
+          const now = new Date().toLocaleTimeString();
+          const scrollTop = scrollContainer.scrollTop;
+          const sections = Array.from(document.querySelectorAll('.scroll-section'));
+          let currentVisibleSection = -1;
+          
+          sections.forEach((section, index) => {
+            const rect = section.getBoundingClientRect();
+            if (rect.top >= -100 && rect.top <= 100) {
+              currentVisibleSection = index;
+            }
+          });
+          
+          debugPanel.innerHTML = `
+            <strong>🔍 Scroll Debug (Ctrl+D to toggle)</strong><br>
+            Time: ${now}<br>
+            Event: ${info}<br>
+            Scroll Top: ${scrollTop.toFixed(0)}px<br>
+            Current Section (nav): ${currentSection}<br>
+            Visible Section: ${currentVisibleSection}<br>
+            Dashboard Section Indices: ${dashboardSectionIndices.join(', ')}<br>
+            Scroll Events: ${scrollEventCount}<br>
+            <br>
+            <strong>Recent Events:</strong><br>
+            <div id="debugLog" style="max-height: 200px; overflow-y: auto;"></div>
+          `;
+        }
+        
+        // Log events to debug panel
+        const debugLog = [];
+        function logDebug(msg) {
+          const timestamp = new Date().toLocaleTimeString([], {hour12: false, hour: '2-digit', minute:'2-digit', second: '2-digit', fractionalSecondDigits: 3});
+          debugLog.unshift(`${timestamp}: ${msg}`);
+          if (debugLog.length > 20) debugLog.pop();
+          
+          const logDiv = document.getElementById('debugLog');
+          if (logDiv) {
+            logDiv.innerHTML = debugLog.join('<br>');
+          }
+          console.log(`🔍 ${timestamp}: ${msg}`);
+        }
+        
+        // Monitor for any scroll changes after dashboard interactions
+        const scrollMonitor = (eventType) => {
+          const now = Date.now();
+          if (now - lastScrollTime < 500) return; // Debounce
+          
+          const rect = dashboardSection.getBoundingClientRect();
+          logDebug(`${eventType} triggered - Dashboard rect.top: ${rect.top.toFixed(0)}px`);
+          
+          // If we've scrolled away from dashboard sections
+          if (dashboardSectionIndices.includes(currentSection) && Math.abs(rect.top) > window.innerHeight * 0.5) {
+            logDebug('⚠️ Detected unwanted scroll from dashboard, correcting...');
+            // Force scroll back to current dashboard section
             setTimeout(() => {
-              if (window.pageYOffset !== scrollBefore) {
-                window.scrollTo(0, scrollBefore);
-              }
+              scrollToSection(currentSection);
             }, 100);
-          } catch (e) {
-            // Silently handle any cross-origin errors
+          }
+          
+          lastScrollTime = now;
+          updateDebug(eventType);
+        };
+        
+        // Track all scroll events
+        scrollContainer.addEventListener('scroll', (e) => {
+          scrollEventCount++;
+          const scrollTop = scrollContainer.scrollTop;
+          const sections = Array.from(document.querySelectorAll('.scroll-section'));
+          let targetSection = -1;
+          
+          sections.forEach((section, index) => {
+            if (scrollTop >= section.offsetTop - 50 && scrollTop < section.offsetTop + section.offsetHeight - 50) {
+              targetSection = index;
+            }
+          });
+          
+          logDebug(`Scroll event - scrollTop: ${scrollTop.toFixed(0)}px, target section: ${targetSection}`);
+          updateDebug('scroll');
+        }, { passive: true });
+        
+        // Monitor iframe interactions for all dashboard wrappers
+        dashboardWrappers.forEach((dashboardWrapper, wrapperIndex) => {
+          dashboardWrapper.addEventListener('click', (e) => {
+            logDebug(`Click on dashboard wrapper ${wrapperIndex}`);
+            scrollMonitor('dashboard-click');
+          });
+          
+          dashboardWrapper.addEventListener('mousedown', (e) => {
+            logDebug(`Mousedown on dashboard wrapper ${wrapperIndex}`);
+            scrollMonitor('dashboard-mousedown');
+          });
+        });
+        
+        dashboardFrames.forEach((dashboardFrame, frameIndex) => {
+          dashboardFrame.addEventListener('focus', (e) => {
+            logDebug(`Focus on dashboard frame ${frameIndex}`);
+            scrollMonitor('dashboard-focus');
+          }, true);
+        });
+        
+        // Monitor for focus changes globally
+        document.addEventListener('focusin', (e) => {
+          const isInDashboard = Array.from(dashboardWrappers).some(wrapper => wrapper.contains(e.target));
+          const isDashboardFrame = Array.from(dashboardFrames).includes(e.target);
+          if (isDashboardFrame || isInDashboard) {
+            logDebug(`Focus moved to: ${e.target.tagName} ${e.target.id || e.target.className}`);
+          }
+        }, true);
+        
+        // Monitor hash changes
+        window.addEventListener('hashchange', (e) => {
+          logDebug(`Hash changed from ${e.oldURL} to ${e.newURL}`);
+        });
+        
+        // Monitor popstate events
+        window.addEventListener('popstate', (e) => {
+          logDebug('Popstate event fired');
+        });
+        
+        // Monitor iframe messages from all dashboard frames
+        window.addEventListener('message', (e) => {
+          const isDashboardSource = Array.from(dashboardFrames).some(frame => e.source === frame.contentWindow);
+          if (isDashboardSource) {
+            logDebug(`Message from dashboard iframe: ${JSON.stringify(e.data).slice(0, 100)}`);
           }
         });
         
-        // Additional protection against programmatic scrolling
-        const originalScrollTo = window.scrollTo;
-        const originalScrollBy = window.scrollBy;
+        // Override scrollIntoView to track what's calling it
+        const originalScrollIntoView = Element.prototype.scrollIntoView;
+        Element.prototype.scrollIntoView = function(...args) {
+          const element = this;
+          const section = element.closest('.scroll-section');
+          const sectionIndex = section ? Array.from(document.querySelectorAll('.scroll-section')).indexOf(section) : -1;
+          logDebug(`scrollIntoView called on ${element.tagName}.${element.className} (section ${sectionIndex})`);
+          
+          // If this is being called on a section other than current dashboard while we're viewing a dashboard
+          if (dashboardSectionIndices.includes(currentSection) && sectionIndex !== -1 && !dashboardSectionIndices.includes(sectionIndex)) {
+            logDebug(`🚫 Blocking scrollIntoView to section ${sectionIndex} while on dashboard section ${currentSection}`);
+            return;
+          }
+          
+          return originalScrollIntoView.apply(this, args);
+        };
+        
+        // Monitor for any element with id="dashboard" or containing "clean" in id/class
+        const suspiciousScrollCheck = () => {
+          const elements = document.querySelectorAll('[id*="clean"], [class*="clean"], [id*="process"], [class*="process"], [id*="dashboard"]');
+          elements.forEach(el => {
+            const rect = el.getBoundingClientRect();
+            if (rect.top === 0) {
+              logDebug(`⚠️ Suspicious element at top: ${el.tagName}#${el.id}.${el.className}`);
+            }
+          });
+        };
+        
+        // Check periodically for suspicious scroll positions
+        setInterval(suspiciousScrollCheck, 2000);
+        
+        // Monitor scroll events after dashboard interactions for all dashboard wrappers
+        dashboardWrappers.forEach(dashboardWrapper => {
+          dashboardWrapper.addEventListener('click', () => {
+            logDebug('Setting up temporary scroll monitoring after click');
+            // Set up temporary scroll monitoring
+            const tempScrollHandler = () => {
+              scrollMonitor('post-click-scroll');
+              // Remove after a short time
+              setTimeout(() => {
+                scrollContainer.removeEventListener('scroll', tempScrollHandler);
+              }, 1000);
+            };
+            
+            scrollContainer.addEventListener('scroll', tempScrollHandler);
+          });
+        });
+        
+        // Initial debug update
+        updateDebug('initialized');
+        debugPanel.style.display = 'none'; // Hidden by default, press Ctrl+D to show
+        logDebug('Debug system initialized - Press Ctrl+D to toggle panel');
+        
+        // Intercept window.scrollTo and window.scrollBy
+        const originalWindowScrollTo = window.scrollTo;
+        const originalWindowScrollBy = window.scrollBy;
         
         window.scrollTo = function(...args) {
-          if (!scrollLocked) {
-            originalScrollTo.apply(window, args);
+          logDebug(`🚫 window.scrollTo called with args: ${JSON.stringify(args)}`);
+          const stackTrace = new Error().stack;
+          logDebug(`Stack trace: ${stackTrace.split('\n')[2]}`);
+          // Block if we're on any dashboard section
+          if (dashboardSectionIndices.includes(currentSection)) {
+            logDebug(`Blocking window.scrollTo while on dashboard section ${currentSection}`);
+            return;
           }
+          return originalWindowScrollTo.apply(window, args);
         };
         
         window.scrollBy = function(...args) {
-          if (!scrollLocked) {
-            originalScrollBy.apply(window, args);
+          logDebug(`🚫 window.scrollBy called with args: ${JSON.stringify(args)}`);
+          const stackTrace = new Error().stack;
+          logDebug(`Stack trace: ${stackTrace.split('\n')[2]}`);
+          // Block if we're on any dashboard section
+          if (dashboardSectionIndices.includes(currentSection)) {
+            logDebug(`Blocking window.scrollBy while on dashboard section ${currentSection}`);
+            return;
           }
+          return originalWindowScrollBy.apply(window, args);
         };
+        
+        // Monitor anchor clicks
+        document.addEventListener('click', (e) => {
+          const link = e.target.closest('a');
+          if (link && link.hash) {
+            logDebug(`Anchor link clicked: ${link.hash}`);
+            const targetId = link.hash.slice(1);
+            const targetElement = document.getElementById(targetId);
+            if (targetElement) {
+              const section = targetElement.closest('.scroll-section');
+              if (section) {
+                logDebug(`Anchor targets section: ${Array.from(document.querySelectorAll('.scroll-section')).indexOf(section)}`);
+              }
+            }
+          }
+        }, true);
+        
+        // CRITICAL FIX: Block Looker navigation from affecting parent page
+        // Looker's embedded navigation can trigger scroll to elements with matching IDs
+        const blockLookerNavigation = () => {
+          // Override getElementById temporarily when we detect Looker activity
+          const originalGetElementById = document.getElementById.bind(document);
+          let isBlockingLooker = false;
+          
+          document.getElementById = function(id) {
+            if (isBlockingLooker && (id === 'dashboard' || id.includes('page') || id.includes('section'))) {
+              logDebug(`🚫 Blocked getElementById('${id}') during Looker navigation`);
+              return null;
+            }
+            return originalGetElementById(id);
+          };
+          
+          // Detect Looker navigation attempts for all dashboard frames
+          dashboardFrames.forEach((dashboardFrame, frameIndex) => {
+            dashboardFrame.addEventListener('load', () => {
+              logDebug(`Looker iframe ${frameIndex} loaded/reloaded - blocking navigation for 2s`);
+              isBlockingLooker = true;
+              setTimeout(() => {
+                isBlockingLooker = false;
+                logDebug('Re-enabled getElementById');
+              }, 2000);
+            });
+          });
+          
+          // Monitor for Looker-specific hash patterns
+          const originalLocation = Object.getOwnPropertyDescriptor(window, 'location');
+          Object.defineProperty(window, 'location', {
+            get: function() {
+              return new Proxy(originalLocation.get.call(window), {
+                set: function(target, property, value) {
+                  if (property === 'hash' && value.includes('page')) {
+                    logDebug(`🚫 Blocked Looker hash navigation: ${value}`);
+                    return true;
+                  }
+                  return Reflect.set(target, property, value);
+                }
+              });
+            },
+            configurable: true
+          });
+        };
+        
+        blockLookerNavigation();
+        
+        // Additional protection: Remove any element with dashboard ids that aren't our sections
+        const cleanupDuplicateIds = () => {
+          const dashboardIds = ['dashboard', 'dashboard-snapshot', 'dashboard-timing', 'dashboard-patterns', 'dashboard-origins', 'dashboard-distances', 'dashboard-demographics'];
+          dashboardIds.forEach(id => {
+            const elements = document.querySelectorAll(`#${id}`);
+            elements.forEach((el, index) => {
+              if (index > 0 || !el.classList.contains('scroll-section')) {
+                logDebug(`Removing duplicate/unwanted #${id} element: ${el.tagName}.${el.className}`);
+                el.removeAttribute('id');
+              }
+            });
+          });
+        };
+        
+        // Run cleanup periodically
+        setInterval(cleanupDuplicateIds, 1000);
+        cleanupDuplicateIds();
       }
+      
+      // Override default scroll restoration
+      if ('scrollRestoration' in history) {
+        history.scrollRestoration = 'manual';
+      }
+      
+      // Global handler for Looker-induced navigation
+      let isHandlingLookerNav = false;
+      
+      // Monitor for hash changes that might come from Looker
+      window.addEventListener('hashchange', (e) => {
+        console.log('🔗 Hash change detected:', e);
+        e.preventDefault();
+        return false;
+      });
+      
+      // Intercept any navigation attempts
+      const originalPushState = history.pushState;
+      const originalReplaceState = history.replaceState;
+      
+      history.pushState = function(...args) {
+        console.log('🚫 Blocked pushState:', args);
+        // Don't apply if it looks like a Looker navigation
+        if (!isHandlingLookerNav && args[2] && args[2].includes('#')) {
+          isHandlingLookerNav = true;
+          setTimeout(() => { isHandlingLookerNav = false; }, 1000);
+          return;
+        }
+        return originalPushState.apply(history, args);
+      };
+      
+      history.replaceState = function(...args) {
+        console.log('🚫 Blocked replaceState:', args);
+        // Don't apply if it looks like a Looker navigation
+        if (!isHandlingLookerNav && args[2] && args[2].includes('#')) {
+          isHandlingLookerNav = true;
+          setTimeout(() => { isHandlingLookerNav = false; }, 1000);
+          return;
+        }
+        return originalReplaceState.apply(history, args);
+      };
+      
+      // Final failsafe: Monitor the actual scroll position for all dashboard sections
+      let dashboardScrollLock = false;
+      const dashboardObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.target.classList.contains('dashboard-section')) {
+            // If any dashboard is mostly in view, lock scrolling temporarily
+            if (entry.intersectionRatio > 0.5) {
+              dashboardScrollLock = true;
+              setTimeout(() => { dashboardScrollLock = false; }, 2000);
+            }
+          }
+        });
+      }, { threshold: [0.5] });
+      
+      dashboardSections.forEach(section => {
+        dashboardObserver.observe(section);
+      });
+      
+      // Apply scroll lock when needed
+      const originalScrollTo = scrollContainer.scrollTo;
+      const originalScrollBy = scrollContainer.scrollBy;
+      
+      scrollContainer.scrollTo = function(...args) {
+        if (dashboardScrollLock) {
+          console.log('🔒 Scroll locked, preventing scrollTo');
+          return;
+        }
+        return originalScrollTo.apply(scrollContainer, args);
+      };
+      
+      scrollContainer.scrollBy = function(...args) {
+        if (dashboardScrollLock) {
+          console.log('🔒 Scroll locked, preventing scrollBy');
+          return;
+        }
+        return originalScrollBy.apply(scrollContainer, args);
+      };
     })();
   </script>
 </body>
